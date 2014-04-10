@@ -1,0 +1,183 @@
+require 'json'
+require 'uri'
+require 'net/http'
+
+require_relative ('./cedilla/author.rb')
+require_relative ('./cedilla/citation.rb')
+require_relative ('./cedilla/translator.rb')
+
+class CedillaService
+  attr_accessor :translator, :attempts, :redirects
+
+  # -------------------------------------------------------------------------
+  def initialize(config)
+    @translator = Cedilla::Translator.new
+    
+    @attempts = 0
+    @redirects = 0
+    
+    unless config.nil?
+      @target = config['target']
+      @query_string = config['query_string']
+      
+      @max_attempts = config['max_attempts'].nil? ? 1 : config['max_attempts'].is_a?(String) ? config['max_attempts'].to_i : config['max_attempts']
+
+      @http_method = config['http_method'].nil? ? 'get' : config['http_method'].downcase
+      @http_timeout = config['http_timeout'].nil? ? 5 : config['http_timeout'].is_a?(String) ? config['http_timeout'].to_i : config['http_timeout']
+      @http_max_redirects = config['http_max_redirects'].nil? ? 8 : config['http_max_redirects'].is_a?(String) ? config['http_max_redirects'].to_i : config['http_max_redirects']
+      @http_error_on_non_200 = config['http_error_on_non_200'].nil? ? true : config['http_error_on_non_200'].is_a?(String) ? config['http_error_on_non_200'] == 'true' : config['http_error_on_non_200'] 
+      @http_cookies = config['http_cookies']
+      
+    else
+      raise Exception.new("You must supply a configuration hash!")
+    end
+  end
+  
+  # -------------------------------------------------------------------------
+  def build_form_data(citation)
+    hash = citation._to_hash
+    hash.map{ |k,v| "<input type='hidden' id='#{k}' name='#{k}' value='#{v}' />" }.join('<br />')
+  end
+  
+  # -------------------------------------------------------------------------
+  def add_citation_to_target(citation)
+    out = build_target
+    query = @translator.hash_to_query_string(citation.to_hash)
+    "#{out}#{(out.include?('?') ? (out[-1] == '?' ? "#{query}" : "&#{query}") : "?#{query}")}"
+  end
+  
+  # -------------------------------------------------------------------------
+  def process_response(status, headers, body)
+    hdrs = ""
+    headers.each{ |k,v| hdrs += "#{k} => #{v}, " }
+    
+    "HTTP Status: #{status.to_s}\n" +
+    "HTTP Headers: #{hdrs}\n" +
+    "HTTP Body: #{body.to_s}"
+  end
+  
+  # -------------------------------------------------------------------------
+  def process_request(citation, headers)
+    @attempts += 1
+      
+    data = ""
+
+    # Add the citation info to the query string
+    target = (@http_method == 'get' ? self.add_citation_to_target(citation) : build_target)
+
+    # Call the target
+    begin  
+      unless target.nil? or target.strip == ''
+        response = call_target(citation, target, headers, 0)
+      end
+    
+    rescue => e
+      if @attempts < @max_attempts.to_i
+        begin
+          self.process_request(citation, headers)
+        rescue => e
+          raise
+        end
+      
+      else 
+        @response_status = response.code.to_i unless response.nil?
+        response.header.each_header{ |key,val| @response_headers["#{key.to_s}"] = val.to_s } unless response.nil?
+        @response_body = response.body.to_s unless response.nil?
+          
+        raise
+      end
+    end
+      
+    unless response.nil?
+      # Mark the call as an error unless a 2xx status was received
+      if @http_error_on_non_200 and ['0', '1', '4', '5', '6', '7', '8', '9'].include?(response.code[0])
+        if @attempts < @max_attempts.to_i
+          begin
+            self.process_request(citation, headers)
+          rescue => e
+            raise
+          end
+        else
+          @response_status = response.code.to_i unless response.nil?
+          response.header.each_header{ |key,val| @response_headers["#{key.to_s}"] = val.to_s } unless response.nil?
+          @response_body = response.body.to_s unless response.nil?
+            
+          raise Exception.new("Received a #{response.code} from the target!") 
+          end
+        end
+          
+      # Set the response objects
+      status = response.code.to_i
+      headers = {}
+      response.each_header.map{ |key,val| headers["#{key.to_s}"] = val.to_s }
+      body = response.body.to_s
+        
+      # Process the results
+      return self.process_response(status, headers, body)
+          
+    else
+      raise Exception.new("Unable to contact the target!")
+    end
+    
+  end
+
+  
+private
+  # -------------------------------------------------------------------------
+  def build_target
+    out = "#{@target}"
+    out += "#{(out.include?('?') ? (out[-1] == '?' ? "#{@query_string}" : "&#{@query_string}") : "?#{@query_string}") unless @query_string.nil?}"
+    out = (['?', '&'].include?(out[-1]) ? out[0..out.size - 2] : out)
+    out.gsub(' ', '%20')
+    out
+  end
+  
+  # -------------------------------------------------------------------------
+  def call_target(citation, target, headers, redirect)
+    
+    # TODO: transform citation (and its authors) into an appropriate request for 
+    #       the services endpoint (e.g. HTTP GET with citation info in the query string)
+    url = URI.parse(target)
+      
+    #puts "calling: #{target}"
+      
+    headers = {} unless headers.is_a?(Hash)
+    headers[:Cookie] = @http_cookies unless @http_cookies.nil?
+      
+    response = Net::HTTP.start(url.host, url.port) do |http|
+      http.open_timeout = @http_timeout
+      http.read_timeout = @http_timeout
+      http.use_ssl = true if url.scheme == "https"
+        
+      case @http_method.downcase
+      when 'get'
+        http.get(url.request_uri, headers) 
+            
+      when 'patch'
+        http.patch(url.request_uri, build_form_data(citation), headers)
+            
+      else
+        http.post(url.request_uri, build_form_data(citation), headers)
+      end
+
+    end
+      
+    # Deal with redirects from the service endpoint
+    if response.code.to_i >= 300 and response.code.to_i < 400 and @redirects < @http_max_redirects
+      @redirects += 1
+      
+      # Sometimes the redirect location comes back as a fully qualified uri, sometimes just the path!
+      if 0 == (response['location'].to_s =~ /http[s]?:\/\//)
+        new_target = response['location']
+      else
+        new_target = "#{url.scheme}://#{url.host}#{url.port.nil? ? '' : ":#{url.port}"}#{response['location']}"
+      end
+   
+      response = call_target(citation, new_target, headers, redirect + 1)
+    end
+      
+    response
+  end
+    
+end
+  
