@@ -1,0 +1,10 @@
+max_attempts: 3
+
+target: 'http://my.service.org/post'
+
+query_string: ''    
+
+http_method: 'post'
+http_timeout: 5
+http_error_on_non_200: false
+http_max_redirects: 5
