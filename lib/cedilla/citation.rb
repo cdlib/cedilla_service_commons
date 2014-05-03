@@ -28,13 +28,13 @@ module Cedilla
     attr_accessor :short_titles, :others
 
 # --------------------------------------------------------------------------------------------------------------------    
-    def initialize(params = {})  
+    def initialize(params = {})
       
-      @resources = {} if params[:resources].nil?
-      @authors = {}
+      @resources = Set.new #if params[:resources].nil?
+      @authors = Set.new
       
       @others = {}
-      @short_titles = {}
+      @short_titles = Set.new
       
       auth_params = {}
       
@@ -45,20 +45,11 @@ module Cedilla
         if self.respond_to?("#{key}=")
           self.method("#{key}=").call(val)
           
-        elsif key == 'short_titles' 
-          @short_titles << val
-          
-        elsif key == 'others'
-          @others << val
-          
-        elsif key == 'authors' and (val.is_a?(Hash))
-          val.each{ |auth| @authors << auth unless self.has_author(auth) or !auth.is_a?(Cedilla::Author)}
-          
         elsif key.index('author_') == 0
           auth_params["#{key.gsub('author_', '')}"] = val
           
         else
-          @others << "#{key}=#{val}"
+          @others[key]=val
         end
       end
       
@@ -117,9 +108,9 @@ module Cedilla
 # --------------------------------------------------------------------------------------------------------------------
     def valid?
       # A Citation MUST have a genre and a content type
-      !@genre.nil? and @genre != '' and !@content_type.nil? and @content_type != '' and @errors.empty?
+      !@genre.nil? and @genre != '' and !@content_type.nil? and @content_type != '' and @genre != 'bogus' and @content_type != 'bogus'
     end
-
+    
 # --------------------------------------------------------------------------------------------------------------------
 # Determine whether or not the citation has an identifier
 # --------------------------------------------------------------------------------------------------------------------    
@@ -196,7 +187,7 @@ module Cedilla
     
 # --------------------------------------------------------------------------------------------------------------------
     def isbn
-      (@isbn_10.nil? or @isbn_10 == '') ? @isbn_13 : @isbn_1o
+      isbn = (@isbn_10.nil? or @isbn_10 == '') ? @isbn_13 : @isbn_10
     end
     
 # --------------------------------------------------------------------------------------------------------------------    
@@ -213,6 +204,30 @@ module Cedilla
     end
     
 # --------------------------------------------------------------------------------------------------------------------
+    def authors=(val)
+      val.each do |auth| 
+        if auth.is_a?(Cedilla::Author)
+          @authors << auth 
+        elsif auth.is_a?(Hash)
+          @authors << Cedilla::Author.new(auth)
+        end
+      end
+    end
+    
+# --------------------------------------------------------------------------------------------------------------------
+    def resources=(val)
+      #val.each ( |res| res.is_a?(Cedilla::Resource) ? @resources << res : @resources << Cedilla::Resource.new(res) ) if val.is_a?(Array)
+      
+      val.each do |res| 
+        if res.is_a?(Cedilla::Resource)
+          @resources << res 
+        elsif res.is_a?(Hash)
+          @resources << Cedilla::Resource.new(res)
+        end
+      end
+    end
+    
+# --------------------------------------------------------------------------------------------------------------------
     def to_s
       "genre: '#{@genre}', content_type: '#{@content_type}', " + identifiers.map{ |x,y| "#{x}: '#{y}'" }.join(', ')
     end
@@ -224,12 +239,22 @@ module Cedilla
       self.methods.each do |method|
         name = method.id2name.gsub('=', '')
         val = self.method(name).call if method.id2name[-1] == '=' and self.respond_to?(name)  
-        ret["#{name}"] = val unless val.nil? or ['!', 'others', 'resources', 'short_titles', 'authors', 'errors'].include?(name)
+        ret["#{name}"] = val unless val.nil? or ['!', 'others', 'resources', 'short_titles', 'authors'].include?(name)
       end
 
       ret["short_titles"] = @short_titles.first unless @short_titles.empty?
       
-      @others.each{ |item| parts = item.split('='); ret["#{parts[0]}"] = "#{parts[1]}" }
+      ret = ret.merge(@others)
+      
+      #authors to hash
+      auths = Array.new
+      @authors.each{ |auth| auths << auth.to_hash if auth.is_a?(Cedilla::Author)}
+      ret["authors"] = auths unless auths.nil? or auths.empty?
+      
+      #resources to hash
+      resArr = Array.new
+      @resources.each{ |res| resArr << res.to_hash if res.is_a?(Cedilla::Resource)}
+      ret["resources"] = resArr unless resArr.nil? or resArr.empty?
       
       ret
     end

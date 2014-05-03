@@ -12,12 +12,11 @@ module Cedilla
     attr_accessor :rating  # Can be used by the client for sorting purposes the highest score should be at the top
     
     # The others attribute is meant to store undefined citation parameters that came in from the client
-    attr_accessor :others, :errors
+    attr_accessor :others
 
 # --------------------------------------------------------------------------------------------------------------------    
     def initialize(params = {})
       @others = {}
-      @errors = {}
       
       # Assign the appropriate params to their attributes, place everything else in others
       params.each do |key,val|
@@ -26,7 +25,7 @@ module Cedilla
         if self.respond_to?("#{key}=")
           self.method("#{key}=").call(val)
         else
-          @others << "#{key}=#{val}"
+          @others[key]=val
         end
       end
       
@@ -45,42 +44,22 @@ module Cedilla
     end
   
 # --------------------------------------------------------------------------------------------------------------------
-# If the resoource has a target or catalog_target AND there are no errors
+# If the resource has a target or catalog_target AND there are no errors
 # --------------------------------------------------------------------------------------------------------------------  
     def valid?
-      (!@target.nil? or !@catalog_target.nil? or !@local_id.nil?) and @errors.empty?
-    end      
+      !@target.nil? or !@catalog_target.nil? or !@local_id.nil?
+    end
     
 # --------------------------------------------------------------------------------------------------------------------
-    def target=(val)
-      CedillaValidation.valid_url?(val) ? @errors.delete(:target) : @errors[:target] = InvalidURLError.new
-      @target = val
-    end
-  
-# --------------------------------------------------------------------------------------------------------------------
-    def catalog_target=(val)
-      CedillaValidation.valid_url?(val) ? @errors.delete(:catalog_target) : @errors[:catalog_target] = InvalidURLError.new
-      @catalog_target = val
-    end
-  
-# --------------------------------------------------------------------------------------------------------------------
     def availability=(val)
-      !!val == val ? @errors.delete(:availability) : @errors[:availability] = InvalidBooleanError.new
-      @availability = val
+      @availability = !!val == val ? val : false
     end
-
-# --------------------------------------------------------------------------------------------------------------------  
-    def format=(val) 
-      FORMATS[:"#{val}"].nil? and FORMATS.select{ |x,y| y == val }.empty? ? @errors[:format] = InvalidResourceFormatError.new : 
-                                                                            @errors.delete(:format)
-      @format = val
-    end
-  
+    
 # --------------------------------------------------------------------------------------------------------------------
     def to_s
       "source: '#{@source}', location: '#{@location}', target: '#{@target}'"
     end
-  
+    
 # --------------------------------------------------------------------------------------------------------------------
     def to_hash
       ret = {}
@@ -90,14 +69,14 @@ module Cedilla
         
         if method.id2name[-1] == '=' and self.respond_to?(name)  
           val = self.method(name).call 
-          ret["#{name}"] = val unless val.nil? or ['!', 'errors', 'others'].include?(name)
+          ret["#{name}"] = val unless val.nil? or ['!', 'others'].include?(name)
         end
       end
       
-      @others.each{ |item| parts = item.split('='); ret["#{parts[0]}"] = "#{parts[1]}" }
-
+      ret = ret.merge(@others)
+      
       ret
     end
-
+    
   end
 end

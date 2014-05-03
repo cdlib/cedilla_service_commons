@@ -36,9 +36,16 @@ module Cedilla
    
     # -----------------------------------------------------------------------------------------------------------------
     def hash_to_query_string(hash)
-      hash.map{ |x,y| "#{URI.escape(x)}=#{URI.escape(y)}"}.join('&') if hash.is_a?(Hash)
+      out = Array.new
+      hash_to_query_string_recursive(hash, out) if hash.is_a?(Hash)
+      query_string = out.empty? ? "" : out.join('&')
     end
     
+# -----------------------------------------------------------------------------------------------------------------
+  private 
+    def hash_to_query_string_recursive(hash, out)
+      hash.map{ |k,v| v.is_a?(Array) ? v.each { |item| hash_to_query_string_recursive(item, out) } : out << "#{URI.escape(k)}=#{URI.escape(v.to_s)}" } if hash.is_a?(Hash)
+    end
   end
   
 end

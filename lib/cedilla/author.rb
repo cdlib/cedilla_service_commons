@@ -20,7 +20,7 @@ module Cedilla
         if self.respond_to?("#{key}=")
           self.method("#{key}=").call(val)
         else
-          @others << "#{key}=#{val}"
+          @others[key]=val
         end
       end
     end
@@ -138,7 +138,7 @@ module Cedilla
 
 # --------------------------------------------------------------------------------------------------------------------          
     def full_name
-      @full_name.strip.strip unless @full_name.nil?
+      @full_name.strip unless @full_name.nil?
     end
       
 # --------------------------------------------------------------------------------------------------------------------    
@@ -156,7 +156,7 @@ module Cedilla
         ret["#{name}"] = val unless val.nil? or ['!', 'others'].include?(name)
       end
       
-      @others.each{ |item| parts = item.split('='); ret["#{parts[0]}"] = "#{parts[1]}" }
+      ret = ret.merge(@others)
       
       ret
     end
