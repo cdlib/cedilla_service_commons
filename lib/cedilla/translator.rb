@@ -3,7 +3,7 @@ module Cedilla
   class Translator
    
     # -----------------------------------------------------------------------------------------------------------------
-    def from_cedilla_json(json)
+    def Translator.from_cedilla_json(json)
       begin
         hash = JSON.parse(json)
         
@@ -19,10 +19,10 @@ module Cedilla
     end
     
     # -----------------------------------------------------------------------------------------------------------------
-    def to_cedilla_json(service_name, entity)
+    def Translator.to_cedilla_json(id, entity)
       begin
         JSON.generate({:time => Time.now, 
-                       :service => service_name,
+                       :id => id,
                        :"#{entity.class.to_s.downcase.sub('cedilla::', '')}" => entity.to_hash})
                        
       rescue Exception => e
@@ -35,7 +35,7 @@ module Cedilla
     end
    
     # -----------------------------------------------------------------------------------------------------------------
-    def hash_to_query_string(hash)
+    def Translator.hash_to_query_string(hash)
       out = Array.new
       hash_to_query_string_recursive(hash, out) if hash.is_a?(Hash)
       query_string = out.empty? ? "" : out.join('&')
