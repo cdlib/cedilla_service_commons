@@ -21,9 +21,15 @@ module Cedilla
     # -----------------------------------------------------------------------------------------------------------------
     def Translator.to_cedilla_json(id, entity)
       begin
-        JSON.generate({:time => Time.now, 
-                       :id => id,
-                       :"#{entity.class.to_s.downcase.sub('cedilla::', '')}" => entity.to_hash})
+        map = {:time => Time.now, :id => id}
+        
+        if entity.is_a?(Array)
+          map[:"#{entity.class.to_s.downcase.sub('cedilla::', '')}s"] => [entity.collect{ |e| e.to_hash }]
+        else
+          map[:"#{entity.class.to_s.downcase.sub('cedilla::', '')}s"] => [entity.to_hash]
+        end
+        
+        JSON.generate(map)
                        
       rescue Exception => e
         $stdout.puts("Exception transforming entity to JSON! #{e.message}")
