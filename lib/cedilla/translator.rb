@@ -24,9 +24,9 @@ module Cedilla
         map = {:time => Time.now, :id => id}
         
         if entity.is_a?(Array)
-          map[:"#{entity.class.to_s.downcase.sub('cedilla::', '')}s"] => [entity.collect{ |e| e.to_hash }]
+          map[:"#{entity.class.to_s.downcase.sub('cedilla::', '')}s"] = [entity.collect{ |e| e.to_hash }]
         else
-          map[:"#{entity.class.to_s.downcase.sub('cedilla::', '')}s"] => [entity.to_hash]
+          map[:"#{entity.class.to_s.downcase.sub('cedilla::', '')}s"] = [entity.to_hash]
         end
         
         JSON.generate(map)
