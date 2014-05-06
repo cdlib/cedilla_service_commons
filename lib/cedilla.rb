@@ -143,10 +143,12 @@ private
     headers = {} unless headers.is_a?(Hash)
     headers[:Cookie] = @http_cookies unless @http_cookies.nil?
     
-    response = Net::HTTP.start(url.host, url.port) do |http|
+    http = Net::HTTP.new(url.host, url.port)
+    http.use_ssl = true if url.scheme == 'https'
+    
+    response = http.start do |http|
       http.open_timeout = @http_timeout
       http.read_timeout = @http_timeout
-      http.use_ssl = true if url.scheme == "https"
       
       case @http_method.downcase
       when 'get'
