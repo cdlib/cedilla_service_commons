@@ -10,7 +10,7 @@ module Cedilla
     attr_accessor :subject, :cover_image, :abstract, :text_language
     
     # Identifiers
-    attr_accessor :issn, :eissn, :isbn_10, :eisbn_10, :isbn_13, :eisbn_13, :oclc, :lccn, :doi
+    attr_accessor :issn, :eissn, :isbn, :eisbn, :isbn, :eisbn, :oclc, :lccn, :doi
     attr_accessor :pmid, :coden, :sici, :bici, :dissertation_id
     
     # Titles
@@ -158,10 +158,8 @@ module Cedilla
       ret = {}
       ret['issn'] = @issn unless @issn.nil? or @issn == ''
       ret['eissn'] = @eissn unless @eissn.nil? or @eissn == ''
-      ret['isbn_10'] = @isbn_10 unless @isbn_10.nil? or @isbn_10 == ''
-      ret['eisbn_10'] = @eisbn_10 unless @eisbn_10.nil? or @eisbn_10 == ''
-      ret['isbn_13'] = @isbn_13 unless @isbn_13.nil? or @isbn_13 == ''
-      ret['eisbn_13'] = @eisbn_13 unless @eisbn_13.nil? or @eisbn_13 == ''
+      ret['isbn'] = @isbn unless @isbn.nil? or @isbn == ''
+      ret['eisbn'] = @eisbn unless @eisbn.nil? or @eisbn == ''
       ret['oclc'] = @oclc unless @oclc.nil? or @oclc == ''
       ret['lccn'] = @lccn unless @lccn.nil? or @lccn == ''
       ret['doi'] = @doi unless @doi.nil? or @doi == ''
@@ -174,35 +172,6 @@ module Cedilla
       ret
     end
 
-# --------------------------------------------------------------------------------------------------------------------    
-# The following 4 methods determine whether or not we're working with ISBN 10 or 13 and set the appropriate value. 
-#      ISBN 10 is default
-# --------------------------------------------------------------------------------------------------------------------    
-    def isbn=(val)
-      if val.is_a?(String)
-        @isbn_13 = val if val.gsub(/[^0-9xX]/, '').size == 13
-        @isbn_10 = val if val.gsub(/[^0-9xX]/, '').size != 13
-      end
-    end
-    
-# --------------------------------------------------------------------------------------------------------------------
-    def isbn
-      isbn = (@isbn_10.nil? or @isbn_10 == '') ? @isbn_13 : @isbn_10
-    end
-    
-# --------------------------------------------------------------------------------------------------------------------    
-    def eisbn=(val)
-      if val.is_a?(String)
-        @eisbn_13 = val if val.gsub(/[^0-9xX]/, '').size == 13
-        @eisbn_10 = val if val.gsub(/[^0-9xX]/, '').size != 13
-      end
-    end
-    
-# --------------------------------------------------------------------------------------------------------------------
-    def eisbn
-      (@eisbn_10.nil? or @eisbn_10 == '') ? @eisbn_13 : @eisbn_10
-    end
-    
 # --------------------------------------------------------------------------------------------------------------------
     def authors=(val)
       val.each do |auth| 
