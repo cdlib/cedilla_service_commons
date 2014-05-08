@@ -23,8 +23,21 @@ module Cedilla
       begin
         map = {:time => Time.now, :id => id}
         
-        if entity.is_a?(Array)
-          map[:"#{entity.class.to_s.downcase.sub('cedilla::', '')}s"] = [entity.collect{ |e| e.to_hash }]
+        if entity.is_a?(Hash)
+          entity.each do |key, val|
+            
+            if val.is_a?(Array)
+              map[:"#{key.to_s.downcase}"] = []
+              
+              val.each do |item|
+                map[:"#{key.to_s.downcase}"] << item.to_hash
+              end
+              
+            else
+              map[:"#{key.to_s.downcase}"] = [val.to_hash]
+            end
+          end
+          
         else
           map[:"#{entity.class.to_s.downcase.sub('cedilla::', '')}s"] = [entity.to_hash]
         end

@@ -4,7 +4,7 @@ module Cedilla
     # Author attributes
     attr_accessor :name, :corporate_author, :full_name, :last_name, :first_name, :suffix
     attr_accessor :middle_initial, :first_initial, :initials 
-    attr_accessor :dates
+    attr_accessor :dates, :authority
     
     # The others attribute is meant to store undefined citation parameters that came in from the client
     attr_accessor :others
