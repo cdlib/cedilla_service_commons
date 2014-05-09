@@ -42,11 +42,18 @@ module Cedilla
       params.each do |key,val|
         key = key.id2name if key.is_a?(Symbol)
         
-        if self.respond_to?("#{key}=")
-          self.method("#{key}=").call(val)
+        if key == 'authors'
+          val.each do |auth|
+            @authors << Cedilla::Author.new(auth)
+          end
           
-        elsif key.index('author_') == 0
-          auth_params["#{key.gsub('author_', '')}"] = val
+        elsif key == 'additional'
+          val.each do |k,v|
+            @others[k] = v
+          end
+          
+        elsif self.respond_to?("#{key}=")
+          self.method("#{key}=").call(val)
           
         else
           @others[key]=val
