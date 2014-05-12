@@ -31,6 +31,8 @@ class CedillaService
       @http_error_on_non_200 = config['http_error_on_non_200'].nil? ? true : config['http_error_on_non_200'].is_a?(String) ? config['http_error_on_non_200'] == 'true' : config['http_error_on_non_200'] 
       @http_cookies = config['http_cookies']
       
+      @config = config
+      
     else
       raise Exception.new("You must supply a configuration hash!")
     end
