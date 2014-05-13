@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'cedilla'
-  s.version     = '0.0.47'
+  s.version     = '0.0.48'
   s.date        = '2014-05-05'
   s.summary     = 'Cedilla Service Helper'
   s.description = 'A gem containing citation, author, and resource models as well as a Cedilla JSON <--> Model translator.'

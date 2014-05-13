@@ -11,7 +11,7 @@ module Cedilla
     
     # Identifiers
     attr_accessor :issn, :eissn, :isbn, :eisbn, :isbn, :eisbn, :oclc, :lccn, :doi
-    attr_accessor :pmid, :coden, :sici, :bici, :dissertation_id
+    attr_accessor :pmid, :coden, :sici, :bici, :document_id
     
     # Titles
     attr_accessor :title, :article_title, :journal_title, :chapter_title, :book_title, :series_title
@@ -44,7 +44,11 @@ module Cedilla
         
         if key == 'authors'
           val.each do |auth|
-            @authors << Cedilla::Author.new(auth)
+            if auth.is_a?(Cedilla::Author)
+              @authors << auth
+            else
+              @authors << Cedilla::Author.new(auth)
+            end 
           end
           
         elsif key == 'additional'
@@ -107,7 +111,10 @@ module Cedilla
     def ==(object)
       return false unless object.is_a?(self.class)
       
-      @genre == object.genre and @content_type == object.content_type and self.identifiers == object.identifiers
+      # Otherise determine if the genre, content_type, and at least one of the identifiers match
+      @genre == object.genre and @content_type == object.content_type and (@issn == object.issn or @eissn == object.eissn or @isbn == object.isbn or
+                          @eisbn == object.eisbn or @oclc == object.oclc or @lccn == object.lccn or @doi == object.doi or @pmid == object.pmid or
+                          @coden == object.coden or @sici == object.sici or @bici == object.bici or @document_id == object.document_id)
     end
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -127,7 +134,7 @@ module Cedilla
             (!@isbn_13.nil? and @isbn_13 != '') or (!@eisbn_13.nil? and @eisbn_13 != '') or 
             (!@oclc.nil? and @oclc != '') or (!@lccn.nil? and @lccn != '') or (!@doi.nil? and @doi != '') or 
             (!@pmid.nil? and @pmid != '') or (!@coden.nil? and @coden != '') or (!@sici.nil? and @sici != '') or
-            (!@bici.nil? and !@bici != '') or (!@dissertation_id.nil? and @dissertation_id != '')
+            (!@bici.nil? and !@bici != '') or (!@document_id.nil? and @document_id != '')
     end
     
 # --------------------------------------------------------------------------------------------------------------------
@@ -174,7 +181,7 @@ module Cedilla
       ret['coden'] = @coden unless @coden.nil? or @coden == ''
       ret['sici'] = @sici unless @sici.nil? or @sici == ''
       ret['bici'] = @bici unless @bici.nil? or @bici == ''
-      ret['dissertation_id'] = @dissertation_id unless @dissertation_id.nil? or @dissertation_id == ''
+      ret['document_id'] = @document_id unless @document_id.nil? or @document_id == ''
            
       ret
     end
