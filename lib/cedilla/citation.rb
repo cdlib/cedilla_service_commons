@@ -14,6 +14,7 @@ module Cedilla
     # Identifiers
     attr_accessor :issn, :eissn, :isbn, :eisbn, :isbn, :eisbn, :oclc, :lccn, :doi
     attr_accessor :pmid, :coden, :sici, :bici, :document_id
+    attr_accessor :bibcode, :eric, :oai, :nbn, :hdl
     
     # Titles
     attr_accessor :title, :article_title, :journal_title, :chapter_title, :book_title, :series_title
@@ -231,7 +232,15 @@ module Cedilla
 
       ret["short_titles"] = @short_titles.first unless @short_titles.empty?
       
-      ret = ret.merge(@others)
+      #Merge in the values from the others array!
+      @others.each do |a,b|
+        if a.is_a?(Hash)
+          a.map{|key, value| ret[key] = value }
+          
+        else
+          ret[a] = b
+        end
+      end
       
       #authors to hash
       auths = Array.new
