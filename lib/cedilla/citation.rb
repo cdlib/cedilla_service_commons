@@ -4,6 +4,8 @@ module Cedilla
     
     attr_accessor :genre, :content_type
     
+    attr_accessor :campus, :ip
+    
     attr_accessor :resources, :authors
     
     # These items are updated by the services and sent back to the aggregator
@@ -23,7 +25,9 @@ module Cedilla
     attr_accessor :date, :year, :month, :day, :season, :quarter 
     attr_accessor :volume, :issue, :article_number, :enumeration, :part, :edition, :institute, :series
     attr_accessor :start_page, :end_page, :pages, :charset
-    
+
+    attr_accessor :original_citation
+
     # The others attribute is meant to store undefined citation parameters that came in from the client
     attr_accessor :short_titles, :others
 
