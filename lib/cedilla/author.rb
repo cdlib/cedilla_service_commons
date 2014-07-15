@@ -6,9 +6,6 @@ module Cedilla
     attr_accessor :middle_initial, :first_initial, :initials 
     attr_accessor :dates, :authority
     
-    # The others attribute is meant to store undefined citation parameters that came in from the client
-    attr_accessor :others
-    
 # --------------------------------------------------------------------------------------------------------------------    
     def initialize(params = {})
       @others = {}
@@ -19,8 +16,6 @@ module Cedilla
         
         if self.respond_to?("#{key}=")
           self.method("#{key}=").call(val)
-        else
-          @others[key]=val
         end
       end
     end
@@ -137,8 +132,54 @@ module Cedilla
     end
 
 # --------------------------------------------------------------------------------------------------------------------          
-    def full_name
-      @full_name.strip unless @full_name.nil?
+    def full_name=(val)
+      
+      @dates = val.slice(/[0-9\-]+/) unless val.slice(/[0-9\-]+/).nil?
+      
+      # Last Name, First Name Initial
+      if 0 == (val =~ /[a-zA-Z\s\-]+,\s?[a-zA-Z\s\-]+\s[a-zA-Z]{1}\./)
+        @last_name = val.slice(/[a-zA-Z\s\-]+,/).gsub(',', '')
+        @middle_initial = val.slice(/[a-zA-Z]{1}\./)
+        @first_name = val.gsub("#{@last_name}, ", '').gsub(" #{@middle_initial}", '')
+        
+      # Last Name, Initial Initial
+      elsif 0 == (val =~ /[a-zA-Z\s\-]+,\s?[a-zA-Z]{1}\.\s[a-zA-Z]{1}\./)
+        @last_name = val.slice(/[a-zA-Z\s\-]+,/).gsub(',', '')
+        inits = value.split('.')
+        inits.each do |init|
+          @middle_initial = "#{init.gsub(' ', '')}." unless init.include?(@last_name)
+          @first_initial = "#{init.gsub(' ', '').gsub(',', '').gsub(@last_name, '')}." if init.include?(@last_name)
+        end
+        
+      # Initial Initial Last Name
+      elsif 0 == (val =~ /[a-zA-Z]{1}\.\s+[a-zA-Z]{1}\.\s+[a-zA-Z\s\-]+/)
+        inits = val.split('.')
+        @first_initial = "#{init[0].gsub(' ', '')}."
+        @middle_initial = "#{init[1].gsub(' ', '')}."
+        @last_name = "#{init[2].gsub(' ', '')}"
+        
+      # First Name Initial Last Name
+      elsif 0 == (val =~ /[a-zA-Z\s\-]+\s+[a-zA-Z]{1}\.\s+[a-zA-Z\s\-]+/)
+        inits = val.split('.')
+        @middle_initial = "#{init[0][-1]}."
+        @first_name = "#{init[0][0..init[0].size - 1]}"
+        @last_name = "#{init[1]}"
+        
+      # Last Name, First Name
+      elsif 0 == (val =~ /[a-zA-Z\s\-]+,\s?[a-zA-Z\s\-]+/)
+        names = val.split(', ')
+        @last_name = names[0]
+        @first_name = names[1]
+        
+      # First Name Last Name
+      elsif 0 == (val =~ /[a-zA-Z\s\-]+\s+[a-zA-Z\s\-]+/)
+        names = val.gsub('  ', ' ').split(' ')
+        @first_name = names[0..(names.size / 2) - 1].join(' ')
+        @last_name = names[(names.size / 2)..names.size].join(' ')
+        
+      end
+        
+      @full_name = val
     end
       
 # --------------------------------------------------------------------------------------------------------------------    

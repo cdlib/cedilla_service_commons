@@ -6,15 +6,12 @@ class TestTranslator < Test::Unit::TestCase
     @translator = Cedilla::Translator.new
 
     @empty_citation = Cedilla::Citation.new
-    @citation = Cedilla::Citation.new({:genre => 'book', :content_type => 'electronic', :title => 'The Metamorphosis', :date => '2014', 
-                                       :authors => [Cedilla::Author.new({:last_name => 'Kafka', :first_name => 'Franz'})], 
-                                       :abstract => 'This is " some < html> code.', :blah => 'yadda', :yadda => 'blah'})
     
-    @json = '{"time":"2014-04-21T22:33:02.947Z","service":"service_test","citation":{"genre":"journal","title":"A Tale Of Two Cities","content_type":"full_text","authors":[{"last_name":"Dickens"}]}}'
+    @citation = Cedilla::Citation.new(json)
   end
   
 # -------------------------------------------------------------------------------------------------------  
-  def test_from_cedilla_json
+  def test_from_cedilla_json_for_book
     citation = @translator.from_cedilla_json(@json)
     
     assert_equal 'journal', citation.genre, "Was expecting the citation has genre to be 'journal'!"

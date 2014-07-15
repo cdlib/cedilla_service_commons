@@ -7,7 +7,7 @@ module Cedilla
       begin
         hash = JSON.parse(json)
         
-        citation = Cedilla::Citation.new(hash['citation']) unless hash['citation'].nil?
+        req = Cedilla::Request.new(hash) unless hash['citation'].nil?
                        
       rescue Exception => e
         $stdout.puts("Exception transforming JSON to entities! #{e.message}")
