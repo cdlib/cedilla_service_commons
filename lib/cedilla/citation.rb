@@ -63,6 +63,43 @@ module Cedilla
                                   @dissertation_number == object.dissertation_number or @bibcode == object.bibcode or @eric == object.eric or
                                   @oai == object.oai or @nbn == object.nbn or @hdl == object.hdl)
     end
+    
+# --------------------------------------------------------------------------------------------------------------------    
+# Adds the data elements from the specified citation onto the current citation
+# --------------------------------------------------------------------------------------------------------------------        
+    def combine(citation, force=false)
+      if citation.is_a?(Cedilla::Citation)
+        
+        citation.methods.each do |method|
+          name = method.id2name.gsub('=', '')
+          val = citation.method(name).call if (method.id2name[-1] == '=' and citation.respond_to?(name))
+          
+          unless val.nil?
+            case name
+            when 'others'
+              val.each{ |item| @others << item if !@others.include?(item) }
+              
+            when 'resources'
+              val.each{ |item| @resources << item if !self.has_resource?(item) }
+              
+            when 'authors'
+              val.each{ |item| @authors << item if !self.has_author?(item) }
+              
+            when 'short_titles'
+              val.each{ |item| @short_titles << item if !@short_titles.include?(item) or force }
+              
+            else
+              unless ['!', 'error'].include?(name)
+                self.method("#{name}=").call(val) if self.method("#{name}").call.nil? or force
+              end
+            end
+
+          end
+          
+        end
+        
+      end
+    end
 
 # --------------------------------------------------------------------------------------------------------------------
 # Determine whether or not the citation is valid

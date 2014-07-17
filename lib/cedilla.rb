@@ -69,17 +69,10 @@ class CedillaController
           else
             new_citation = service.process_request(req, headers)
           
-            if new_citation.is_a?(Cedilla::Citation)
-              response.body = Cedilla::Translator.to_cedilla_json(id, new_citation)
-              response.status = 200
-            
-              LOGGER.info "Response received from endpoint for id: #{id}"
-            
-            else
-              LOGGER.info "Response from endpoint was empty for id: #{id}"
-              response.status = 404
-              response.body = Cedilla::Translator.to_cedilla_json(id, Cedilla::Citation.new({}))
-            end
+            response.body = Cedilla::Translator.to_cedilla_json(id, new_citation)
+            response.status = 200
+          
+            LOGGER.info "Response received from endpoint for id: #{id}"
           end
         
         rescue Exception => e
