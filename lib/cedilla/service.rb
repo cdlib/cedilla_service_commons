@@ -67,6 +67,8 @@ module Cedilla
     def process_request(request, headers)
       @attempts += 1
     
+      @request = request
+    
       # Check the API version
       if @min_api_version >= request.api_ver.to_f
     

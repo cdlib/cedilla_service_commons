@@ -18,7 +18,7 @@ module Cedilla
       @requestor_affiliation = params['requestor_affiliation'] || ''
       @requestor_language = params['requestor_language'] || 'en'
       
-      @unmapped = params['unmapped'] | ''
+      @unmapped = params['unmapped'] || ''
       @original_request = params['original_request'] || ''
       
       @referrers = []

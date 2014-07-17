@@ -133,7 +133,6 @@ module Cedilla
 
 # --------------------------------------------------------------------------------------------------------------------          
     def full_name=(val)
-      
       @dates = val.slice(/[0-9\-]+/) unless val.slice(/[0-9\-]+/).nil?
       
       # Last Name, First Name Initial
@@ -145,7 +144,7 @@ module Cedilla
       # Last Name, Initial Initial
       elsif 0 == (val =~ /[a-zA-Z\s\-]+,\s?[a-zA-Z]{1}\.\s[a-zA-Z]{1}\./)
         @last_name = val.slice(/[a-zA-Z\s\-]+,/).gsub(',', '')
-        inits = value.split('.')
+        inits = val.split('.')
         inits.each do |init|
           @middle_initial = "#{init.gsub(' ', '')}." unless init.include?(@last_name)
           @first_initial = "#{init.gsub(' ', '').gsub(',', '').gsub(@last_name, '')}." if init.include?(@last_name)
