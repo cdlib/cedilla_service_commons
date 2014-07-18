@@ -37,7 +37,7 @@ class CedillaController
   # }
   # -------------------------------------------------------------------------
   
-  def handle_request(request, response, service, validation_method)
+  def handle_request(request, response, service)
     headers = {'Content-Type' => 'text/json',
                'Referer' => request.referrer.nil? ? '' : request.referrer }
     #service = SfxService.new
@@ -60,7 +60,7 @@ class CedillaController
         req.requestor_ip = request.ip if req.requestor_ip.nil?
       
         begin
-          if !validation_method.call(req.citation)
+          if !service.validate_citation(req.citation)
             # No ISBN or ISSN was passed, which this service requires so just send back a 404 Not Found
             LOGGER.info "Request did not contain enough info to contact enpoint for id: #{id}"
             response.status = 404  

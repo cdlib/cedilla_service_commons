@@ -38,6 +38,11 @@ module Cedilla
     end
   
     # -------------------------------------------------------------------------
+    def validate_citation(citation)
+      return citation.is_a?(Cedilla::Citation)
+    end
+  
+    # -------------------------------------------------------------------------
     def build_form_data(citation)
       hash = citation.to_hash
     
@@ -146,7 +151,7 @@ module Cedilla
     
       # TODO: transform citation (and its authors) into an appropriate request for 
       #       the services endpoint (e.g. HTTP GET with citation info in the query string)
-      url = URI.parse(target)
+      url = URI.parse(target.gsub('<', '%3C').gsub('>', '%3E').gsub(' ', '%20'))
     
       #puts "calling: #{target}"
     

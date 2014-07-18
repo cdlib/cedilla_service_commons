@@ -39,7 +39,9 @@ module Cedilla
             if auth.is_a?(Cedilla::Author)
               @authors << auth
             else
-              @authors << Cedilla::Author.new(auth)
+              unless auth.empty? 
+                @authors << Cedilla::Author.new(auth)
+              end
             end 
           end
           

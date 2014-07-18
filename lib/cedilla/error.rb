@@ -1,6 +1,6 @@
 module Cedilla
   
-  class Error
+  class Error < Exception
     LEVELS = {:fatal => 0, :error => 1, :warning => 2}
     
     attr_accessor :message, :level
