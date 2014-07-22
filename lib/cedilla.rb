@@ -2,6 +2,7 @@ require 'json'
 require 'uri'
 require 'net/http'
 
+require_relative './cedilla/error.rb'
 require_relative './cedilla/author.rb'
 require_relative './cedilla/citation.rb'
 require_relative './cedilla/request.rb'
