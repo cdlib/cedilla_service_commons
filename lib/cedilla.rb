@@ -2,11 +2,11 @@ require 'json'
 require 'uri'
 require 'net/http'
 
-require './cedilla/author.rb'
-require './cedilla/citation.rb'
-require './cedilla/request.rb'
-require './cedilla/resource.rb'
-require './cedilla/translator.rb'
+require_relative './cedilla/author.rb'
+require_relative './cedilla/citation.rb'
+require_relative './cedilla/request.rb'
+require_relative './cedilla/resource.rb'
+require_relative './cedilla/translator.rb'
 
 class CedillaController
   # -------------------------------------------------------------------------
