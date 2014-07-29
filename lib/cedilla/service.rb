@@ -165,9 +165,6 @@ module Cedilla
         http.open_timeout = @http_timeout
         http.read_timeout = @http_timeout
       
-        puts url.request_uri
-        puts headers.inspect
-      
         case @http_method.downcase
         when 'get'
           http.get(url.request_uri, headers) 

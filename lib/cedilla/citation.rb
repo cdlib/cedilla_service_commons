@@ -25,10 +25,13 @@ module Cedilla
     attr_accessor :volume, :issue, :article_number, :enumeration, :part, :edition, :institution, :series
     attr_accessor :start_page, :end_page, :pages
 
+    attr_accessor :extras
+
 # --------------------------------------------------------------------------------------------------------------------    
     def initialize(params = {})
       @authors = []
       @resources = []
+      @extras = {}
       
       # Assign the appropriate params to their attributes, place everything 
       params.each do |key,val|
@@ -47,6 +50,13 @@ module Cedilla
           
         elsif self.respond_to?("#{key}=")
           self.method("#{key}=").call(val)
+          
+        else
+          if self.extras["#{key}"].nil?
+            self.extras["#{key}"] = []
+          end
+          
+          self.extras["#{key}"] << val
         end
       end
 

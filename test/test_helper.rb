@@ -1,7 +1,9 @@
 ENV['RACK_ENV'] = 'test'
 $LOAD_PATH.unshift(File.absolute_path(File.join(File.dirname(__FILE__), '../')))
+
 require 'rubygems'
-require 'test/unit'
+require 'minitest/autorun'
+
 require 'cedilla'
 
 @invalid_jsons = ['{"time":"2014-04-21T22:33:02.947Z"}',

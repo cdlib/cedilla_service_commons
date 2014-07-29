@@ -12,11 +12,11 @@ module Cedilla
     attr_accessor :rating  # Can be used by the client for sorting purposes the highest score should be at the top
     
     # The others attribute is meant to store undefined citation parameters that came in from the client
-    attr_accessor :others
+    attr_accessor :extras
 
 # --------------------------------------------------------------------------------------------------------------------    
     def initialize(params = {})
-      @others = {}
+      @extras = {}
       
       # Assign the appropriate params to their attributes, place everything else in others
       params.each do |key,val|
@@ -25,7 +25,11 @@ module Cedilla
         if self.respond_to?("#{key}=")
           self.method("#{key}=").call(val)
         else
-          @others[key]=val
+          if self.extras["#{key}"].nil?
+            self.extras["#{key}"] = []
+          end
+          
+          self.extras["#{key}"] << val
         end
       end
       
