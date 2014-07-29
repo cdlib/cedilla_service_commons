@@ -216,25 +216,25 @@ class TestAuthor < Minitest::Test
     auth = Cedilla::Author.new({:corporate_author => 'Some organization'})
     assert_equal 'Some organization', auth.last_name_first, "Was expecting 'Some organization'!"
   end
-=begin      
+
 # --------------------------------------------------------------------------------------------------
   def test_to_hash
-    @author.name = "Johnny Doe Jr."
-    @author.corporate_author = "The author group"
-    
     hash = @author.to_hash
         
-    assert_equal 'John A. Doe', hash['full_name'], "Was expecting the genre to be 'Doe Jr., John A.'!"
-    assert_equal 'Doe', hash['last_name'], "Was expecting the genre to be 'Doe'!"
-    assert_equal 'John', hash['first_name'], "Was expecting the genre to be 'John'!"
-    assert_equal 'Jr.', hash['suffix'], "Was expecting the genre to be 'Jr.'!"
-    assert_equal 'A.', hash['middle_initial'], "Was expecting the genre to be 'A.'!"
-    assert_equal 'J.', hash['first_initial'], "Was expecting the genre to be 'J.'!"
-    assert_equal 'J. A.', hash['initials'], "Was expecting the genre to be 'J. A.'!"
-    assert_equal 'Johnny Doe Jr.', hash['name'], "Was expecting the genre to be 'Johnny Doe Jr.'!"
-    assert_equal 'The author group', hash['corporate_author'], "Was expecting the genre to be 'The author group'!"
+    assert_equal 'John A. Doe', hash['full_name'], "Was expecting the full_name to be 'Doe Jr., John A.'!"
+    assert_equal 'Doe', hash['last_name'], "Was expecting the last_name to be 'Doe'!"
+    assert_equal 'John', hash['first_name'], "Was expecting the first_name to be 'John'!"
+    assert_equal 'Jr.', hash['suffix'], "Was expecting the suffix to be 'Jr.'!"
+    assert_equal 'A.', hash['middle_initial'], "Was expecting the middle_initial to be 'A.'!"
+    assert_equal 'J.', hash['first_initial'], "Was expecting the first_initial to be 'J.'!"
+    assert_equal 'J. A.', hash['initials'], "Was expecting the initials to be 'J. A.'!"
+    assert_equal '1900-1980', hash['dates'], "Was expecting the dates to be '1900-1980'!"
+    assert_equal 'http://localhost:8080/author/doe/john', hash['authority'], "Was expecting the authority to be 'http://localhost:8080/author/doe/john'!"
+    assert_equal 'blah', hash['extras']['foo'][0], "Was expecting the extra, 'foo' to be 'blah!"
     
-    assert_equal 'blah', hash['junk_val'], "Was expecting the others to have been included into the hash!"
+    hash = @corporate.to_hash
+
+    assert_equal 'Some organization', hash['corporate_author'], "Was expecting the corporate_author to be 'Some organization'!"
   end
-=end
+
 end

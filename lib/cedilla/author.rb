@@ -196,7 +196,7 @@ module Cedilla
         ret["#{name}"] = val unless val.nil? or ['!', 'others'].include?(name)
       end
       
-      ret = ret.merge(@others)
+      ret = ret.merge(@extras)
       
       ret
     end
