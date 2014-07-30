@@ -15,25 +15,31 @@ module Cedilla
     attr_accessor :extras
 
 # --------------------------------------------------------------------------------------------------------------------    
-    def initialize(params = {})
-      @extras = {}
+    def initialize(params)
+      if params.is_a?(Hash)
+        @extras = {}
+        @format = FORMATS[:electronic]
       
-      # Assign the appropriate params to their attributes, place everything else in others
-      params.each do |key,val|
-        key = key.id2name if key.is_a?(Symbol)
+        # Assign the appropriate params to their attributes, place everything else in others
+        params.each do |key,val|
+          key = key.id2name if key.is_a?(Symbol)
         
-        if self.respond_to?("#{key}=")
-          self.method("#{key}=").call(val)
-        else
-          if self.extras["#{key}"].nil?
-            self.extras["#{key}"] = []
-          end
+          if self.respond_to?("#{key}=")
+            self.method("#{key}=").call(val)
+          else
+            if self.extras["#{key}"].nil?
+              self.extras["#{key}"] = []
+            end
           
-          self.extras["#{key}"] << val
+            self.extras["#{key}"] << val
+          end
         end
-      end
       
-      @availability = false if @availability.nil?
+        @availability = false if @availability.nil?
+        
+      else
+        raise Error.new("You must supply an attribute hash!")
+      end
     end
     
 # --------------------------------------------------------------------------------------------------------------------    
@@ -41,7 +47,20 @@ module Cedilla
 # --------------------------------------------------------------------------------------------------------------------    
     def ==(object)
       if object.is_a?(self.class)
-        return (@source == object.source) && (@location == object.location) && (@target == object.target)
+        
+        if !@target.nil? and !object.target.nil?
+          return @target == object.target  
+          
+        elsif !@catalog_target.nil? and !object.catalog_target.nil?
+          return @catalog_target == object.catalog_target
+          
+        elsif !@source.nil? and !object.source.nil? and !@location.nil? and !object.location.nil? and !@local_id.nil? and !object.local_id.nil?
+          return (@source == object.source and @location == object.location and @local_id == object.local_id)
+          
+        else
+          return false
+        end
+        
       else
         return false
       end
@@ -58,10 +77,42 @@ module Cedilla
     def availability=(val)
       @availability = !!val == val ? val : false
     end
+
+# --------------------------------------------------------------------------------------------------------------------
+    def format=(val)
+      if val.is_a?(Integer) or val.is_a?(Float)
+        @format = FORMATS.find{ |k,v| v == val }.nil? ? FORMATS[:electronic] : val
+        
+      elsif val.is_a?(Symbol)
+        @format = FORMATS[val].nil? ? FORMATS[:electronic] : FORMATS[val]
+        
+      else
+        @format = FORMATS[val.to_sym].nil? ? FORMATS[:electronic] : FORMATS[val.to_sym]
+      end
+    end
+    
+# --------------------------------------------------------------------------------------------------------------------
+    def format
+      FORMATS.find{|k,v| v == @format }[0].id2name
+    end
     
 # --------------------------------------------------------------------------------------------------------------------
     def to_s
-      "source: '#{@source}', location: '#{@location}', target: '#{@target}'"
+      ret = ""
+      
+      if !@target.nil?
+        ret = "#{@target}"
+        
+      elsif !@catalog_target.nil?
+        ret = "#{@catalog_target}"
+        
+      else
+        ret = @source.to_s
+        ret += (ret.length > 0 ? " - #{@location}" : "#{@location}") unless @location.nil?
+        ret += (ret.length > 0 ? " - #{@local_id}" : "#{@local_id}") unless @local_id.nil?
+      end
+      
+      ret
     end
     
 # --------------------------------------------------------------------------------------------------------------------
@@ -77,7 +128,7 @@ module Cedilla
         end
       end
       
-      ret = ret.merge(@others)
+      ret = ret.merge(@extras)
       
       ret
     end

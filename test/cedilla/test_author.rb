@@ -14,7 +14,7 @@ class TestAuthor < Minitest::Test
                                    :initials => 'J. A.', 
                                    :dates => '1900-1980',
                                    :authority => 'http://localhost:8080/author/doe/john',
-                                   :foo => 'blah'})
+                                   :foo => 'bar'})
                                    
     @corporate = Cedilla::Author.new({:corporate_author => 'Some organization', 
                                       :dates => '1993-'})
@@ -42,7 +42,7 @@ class TestAuthor < Minitest::Test
     assert_equal 'J. A.', @author.initials, "Expected initials to be set on initialization!"
     assert_equal '1900-1980', @author.dates, "Expected dates to be set on initialization!"
     assert_equal 'http://localhost:8080/author/doe/john', @author.authority, "Expected authority to be set on initialization!"
-    assert_equal 'blah', @author.extras['foo'].first, "Expected extras to contain 'foo' to be set on initialization!"
+    assert_equal 'bar', @author.extras['foo'].first, "Expected extras to contain 'foo' to be set on initialization!"
     
     assert_equal 'Some organization', @corporate.corporate_author, "Expected corporate author to be set on initialization!"
     assert_equal '1993-', @corporate.dates, "Expected dates to be set on initialization!"
@@ -218,6 +218,30 @@ class TestAuthor < Minitest::Test
   end
 
 # --------------------------------------------------------------------------------------------------
+  def test_allocation_of_extras
+    assert_equal 1, @author.extras.count, "Was expecting to find one extra!"
+    assert_equal 'bar', @author.extras['foo'][0], "Was expecting extras to contain 'foo' => ['bar']!"
+    
+    @author.extras['foo'] << 'bar2'
+    @author.extras['blah'] = ['blah']
+    
+    assert_equal 2, @author.extras.count, "Was expecting to find two extras!"
+    assert_equal 2, @author.extras['foo'].count, "Was expecting to find two values in foo!"
+    assert_equal 'bar', @author.extras['foo'][0], "Was expecting extras to contain 'foo' => ['bar']!"
+    assert_equal 'bar2', @author.extras['foo'][1], "Was expecting extras to contain 'foo' => ['bar2']!"
+    assert_equal 'blah', @author.extras['blah'][0], "Was expecting extras to contain 'foo' => ['bar']!"
+    
+    assert_equal ['bar', 'bar2'], @author.extras['foo'], "Was expecting extras to contain 'foo' => ['bar', 'bar2']!"
+    assert_equal ['blah'], @author.extras['blah'], "Was expecting extras to contain 'blah' => ['blah']!"
+    
+    @author.extras.delete('blah')
+    assert_equal 1, @author.extras.count, "Was expecting to find one extra!"
+    
+    @author.extras.clear
+    assert_equal 0, @author.extras.count, "Was expecting to find NO extras!"
+  end
+
+# --------------------------------------------------------------------------------------------------
   def test_to_hash
     hash = @author.to_hash
         
@@ -230,11 +254,16 @@ class TestAuthor < Minitest::Test
     assert_equal 'J. A.', hash['initials'], "Was expecting the initials to be 'J. A.'!"
     assert_equal '1900-1980', hash['dates'], "Was expecting the dates to be '1900-1980'!"
     assert_equal 'http://localhost:8080/author/doe/john', hash['authority'], "Was expecting the authority to be 'http://localhost:8080/author/doe/john'!"
-    assert_equal 'blah', hash['extras']['foo'][0], "Was expecting the extra, 'foo' to be 'blah!"
+    assert_equal 'bar', hash['extras']['foo'][0], "Was expecting the extra, 'foo' to be 'blah!"
     
     hash = @corporate.to_hash
 
     assert_equal 'Some organization', hash['corporate_author'], "Was expecting the corporate_author to be 'Some organization'!"
+  end
+
+# --------------------------------------------------------------------------------------------------
+  def test_to_s
+    assert_equal @author.full_name, @author.to_s, 'Was expecting to_s to simply return the full_name'
   end
 
 end

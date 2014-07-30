@@ -28,52 +28,88 @@ module Cedilla
     attr_accessor :extras
 
 # --------------------------------------------------------------------------------------------------------------------    
-    def initialize(params = {})
-      @authors = []
-      @resources = []
-      @extras = {}
+    def initialize(params)
+      if params.is_a?(Hash)
+        @authors = []
+        @resources = []
+        @extras = {}
       
-      # Assign the appropriate params to their attributes, place everything 
-      params.each do |key,val|
-        key = key.id2name if key.is_a?(Symbol)
+        # Assign the appropriate params to their attributes, place everything 
+        params.each do |key,val|
+          key = key.id2name if key.is_a?(Symbol)
         
-        if key == 'authors'
-          val.each do |auth|
-            if auth.is_a?(Cedilla::Author)
-              @authors << auth
-            else
-              unless auth.empty? 
-                @authors << Cedilla::Author.new(auth)
-              end
-            end 
+          if key == 'authors'
+            val.each do |auth|
+              if auth.is_a?(Cedilla::Author)
+                @authors << auth
+              else
+                unless auth.empty? 
+                  @authors << Cedilla::Author.new(auth)
+                end
+              end 
+            end
+          
+          elsif self.respond_to?("#{key}=")
+            self.method("#{key}=").call(val)
+          
+          else
+            if self.extras["#{key}"].nil?
+              self.extras["#{key}"] = []
+            end
+          
+            self.extras["#{key}"] << val
           end
-          
-        elsif self.respond_to?("#{key}=")
-          self.method("#{key}=").call(val)
-          
-        else
-          if self.extras["#{key}"].nil?
-            self.extras["#{key}"] = []
-          end
-          
-          self.extras["#{key}"] << val
         end
-      end
 
+      else
+        raise Error.new("You must supply an attribute hash!")
+      end
     end
     
 # --------------------------------------------------------------------------------------------------------------------    
 # Establish the primary key for the object: identifiers and titles
 # --------------------------------------------------------------------------------------------------------------------    
     def ==(object)
-      return false unless object.is_a?(self.class)
+      ret = false
       
-      # Otherise determine if the genre and at least one of the identifiers match
-      @genre == object.genre and (@issn == object.issn or @eissn == object.eissn or @isbn == object.isbn or @eisbn == object.eisbn or 
-                                  @oclc == object.oclc or @lccn == object.lccn or @doi == object.doi or @pmid == object.pmid or
-                                  @coden == object.coden or @sici == object.sici or @bici == object.bici or @document_id == object.document_id or
-                                  @dissertation_number == object.dissertation_number or @bibcode == object.bibcode or @eric == object.eric or
-                                  @oai == object.oai or @nbn == object.nbn or @hdl == object.hdl)
+      if object.is_a?(self.class)
+        # Check all of the ids for a match
+        ret = @issn == object.issn if !@issn.nil? and !object.issn.nil?
+        ret = @eissn == object.eissn if (!@eissn.nil? and !object.eissn.nil?) and !ret
+        ret = @isbn == object.isbn if (!@isbn.nil? and !object.isbn.nil?) and !ret
+        ret = @eisbn == object.eisbn if (!@eisbn.nil? and !object.eisbn.nil?) and !ret
+        ret = @oclc == object.oclc if (!@oclc.nil? and !object.oclc.nil?) and !ret
+        ret = @lccn == object.lccn if (!@lccn.nil? and !object.lccn.nil?) and !ret
+        ret = @doi == object.doi if (!@doi.nil? and !object.doi.nil?) and !ret
+        ret = @pmid == object.pmid if (!@pmid.nil? and !object.pmid.nil?) and !ret
+        ret = @coden == object.coden if (!@coden.nil? and !object.coden.nil?) and !ret
+        ret = @sici == object.sici if (!@sici.nil? and !object.sici.nil?) and !ret
+        ret = @bici == object.bici if (!@bici.nil? and !object.bici.nil?) and !ret
+        ret = @document_id == object.document_id if (!@document_id.nil? and !object.document_id.nil?) and !ret
+        ret = @dissertation_number == object.dissertation_number if (!@dissertation_number.nil? and !object.dissertation_number.nil?) and !ret
+        ret = @bibcode == object.bibcode if (!@bibcode.nil? and !object.bibcode.nil?) and !ret
+        ret = @eric == object.eric if (!@eric.nil? and !object.eric.nil?) and !ret
+        ret = @oai == object.oai if (!@oai.nil? and !object.oai.nil?) and !ret
+        ret = @nbn == object.nbn if (!@nbn.nil? and !object.nbn.nil?) and !ret
+        ret = @hdl == object.hdl if (!@hdl.nil? and !object.hdl.nil?) and !ret
+        
+        # If no ids matched and either this Citation or the one passed in has no ids then match by titles!
+        if (@issn.nil? and @eissn.nil? and @isbn.nil? and @eisbn.nil? and @oclc.nil? and @lccn.nil? and @doi.nil? and @pmid.nil? and
+                          @coden.nil? and @sici.nil? and @bici.nil? and @document_id.nil? and @dissertation_number.nil? and
+                          @bibcode.nil? and @eric.nil? and @oai.nil? and @nbn.nil? and @hdl.nil?) or
+                  (object.issn.nil? and object.eissn.nil? and object.isbn.nil? and object.eisbn.nil? and object.oclc.nil? and 
+                          object.lccn.nil? and object.doi.nil? and object.pmid.nil? and object.coden.nil? and object.sici.nil? and 
+                          object.bici.nil? and object.document_id.nil? and object.dissertation_number.nil? and
+                          object.bibcode.nil? and object.eric.nil? and object.oai.nil? and object.nbn.nil? and object.hdl.nil?)
+                          
+          ret = @article_title == object.article_title if (!@article_title.nil? and !object.article_title.nil?) and !ret
+          ret = @book_title == object.book_title if (!@book_title.nil? and !object.book_title.nil?) and !ret
+          ret = @title == object.title if (!@title.nil? and !object.title.nil?) and !ret
+          ret = @journal_title == object.journal_title if (!@journal_title.nil? and !object.journal_title.nil?) and !ret
+        end
+      end
+      
+      ret
     end
     
 # --------------------------------------------------------------------------------------------------------------------    
@@ -118,22 +154,21 @@ module Cedilla
 # --------------------------------------------------------------------------------------------------------------------
     def valid?
       # A Citation MUST have a genre and (at least one identifier OR a title and author)
-      @genre and (has_identifier? or (@title and @authors.size > 0))
+      (!@genre.nil? and (has_identifier? or (!@title.nil? and @title != '' and @authors.size > 0)))
     end
     
 # --------------------------------------------------------------------------------------------------------------------
 # Determine whether or not the citation has an identifier
 # --------------------------------------------------------------------------------------------------------------------    
-    def has_identifier?
-      (!@issn.nil? and @issn != '') or (!@eissn.nil? and @eissn != '') or 
-            (!@isbn_10.nil? and @isbn_10 != '') or (!@eisbn_10.nil? and @eisbn_10 != '') or 
-            (!@isbn_13.nil? and @isbn_13 != '') or (!@eisbn_13.nil? and @eisbn_13 != '') or 
-            (!@oclc.nil? and @oclc != '') or (@lccn.nil? and @lccn != '') or (!@doi.nil? and @doi != '') or 
-            (!@pmid.nil? and @pmid != '') or (@coden.nil? and @coden != '') or (!@sici.nil? and @sici != '') or
-            (!@bici.nil? and @bici != '') or (@document_id.nil? and @document_id != '') or
-            (!@dissertation_number.nil? and @dissertation_number != '') or (!@bibcode.nil? and @bibcode != '') or
+    def has_identifier?      
+      ((!@issn.nil? and @issn != '')      or (!@eissn.nil? and @eissn != '') or 
+            (!@isbn.nil? and @isbn != '') or (!@eisbn.nil? and @eisbn != '') or 
+            (!@oclc.nil? and @oclc != '') or (!@lccn.nil? and @lccn != '')   or (!@doi.nil? and @doi != '') or 
+            (!@pmid.nil? and @pmid != '') or (!@coden.nil? and @coden != '') or (!@sici.nil? and @sici != '') or
+            (!@bici.nil? and @bici != '') or (!@document_id.nil? and @document_id != '') or
+            (!@dissertation_number.nil? and @dissertation_number != '')      or (!@bibcode.nil? and @bibcode != '') or
             (!@eric.nil? and @eric != '') or (!@oai.nil? and @oai != '') or 
-            (!@nbn.nil? and @nbn != '') or (!@hdl.nil? and @hdl != '')
+            (!@nbn.nil? and @nbn != '')   or (!@hdl.nil? and @hdl != ''))
     end
     
 # --------------------------------------------------------------------------------------------------------------------
@@ -183,6 +218,7 @@ module Cedilla
       ret['document_id'] = @document_id unless @document_id.nil? or @document_id == ''
       ret['dissertation_number'] = @dissertation_number unless @dissertation_number.nil? or @dissertation_number == ''
       ret['bibcode'] = @bibcode unless @bibcode.nil? or @bibcode == ''
+      ret['eric'] = @eric unless @eric.nil? or @eric == ''
       ret['oai'] = @oai unless @oai.nil? or @oai == ''
       ret['nbn'] = @nbn unless @nbn.nil? or @nbn == ''
       ret['hdl'] = @hdl unless @hdl.nil? or @hdl == ''     

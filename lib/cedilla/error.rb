@@ -23,6 +23,11 @@ module Cedilla
     end
   
     # ----------------------------------------------------------------
+    def to_s
+      "#{self.level}: #{@message}"
+    end
+  
+    # ----------------------------------------------------------------
     def level
       return LEVELS.find{ |k,v| v == @level }[0].to_s
     end
