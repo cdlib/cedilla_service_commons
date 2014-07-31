@@ -3,6 +3,7 @@ $LOAD_PATH.unshift(File.absolute_path(File.join(File.dirname(__FILE__), '../')))
 
 require 'rubygems'
 require 'minitest/autorun'
+require 'webmock/minitest'
 
 require 'cedilla'
 

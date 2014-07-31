@@ -16,8 +16,8 @@ module Cedilla
       @response_status = 500
       @response_headers = {}
       @response_body = ''
-    
-      unless config.nil?
+
+      if config.is_a?(Hash)
         @target = config['target']
         @query_string = config['query_string']
       
@@ -33,7 +33,7 @@ module Cedilla
       
         @config = config
       else
-        raise Exception.new("You must supply a configuration hash!")
+        raise Error.new("You must supply a configuration hash!")
       end
     end
   
@@ -54,7 +54,7 @@ module Cedilla
     # -------------------------------------------------------------------------
     def add_citation_to_target(citation)
       out = build_target
-      query = @translator.hash_to_query_string(citation.to_hash)
+      query = Cedilla::Translator.hash_to_query_string(citation.to_hash)
       "#{out}#{(out.include?('?') ? (out[-1] == '?' ? "#{query}" : "&#{query}") : "?#{query}")}"
     end
   
@@ -119,7 +119,7 @@ module Cedilla
                 raise
               end
             else
-              raise Exception.new("Received a #{response.code} from the target!") 
+              raise "Received a #{response.code} from the target!"
             end
           end
       
@@ -127,11 +127,11 @@ module Cedilla
           return self.process_response
       
         else
-          raise Exception.new("Unable to contact the target!")
+          raise "Unable to contact the target!"
         end
     
       else
-        raise Exception.new("#{self.class} cannot work with JSON data from an API below version #{@min_api_version}")
+        raise "#{self.class} cannot work with JSON data from an API below version #{@min_api_version}"
       end
     end
   

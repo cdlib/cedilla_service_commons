@@ -62,7 +62,7 @@ module Cedilla
     
 # -----------------------------------------------------------------------------------------------------------------
   private 
-    def hash_to_query_string_recursive(hash, out)
+    def Translator.hash_to_query_string_recursive(hash, out)
       hash.map{ |k,v| v.is_a?(Array) ? v.each { |item| hash_to_query_string_recursive(item, out) } : out << "#{URI.escape(k)}=#{URI.escape(v.to_s)}" } if hash.is_a?(Hash)
     end
   end
