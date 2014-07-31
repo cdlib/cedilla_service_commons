@@ -53,11 +53,11 @@ module Cedilla
             self.method("#{key}=").call(val)
           
           else
-            if self.extras["#{key}"].nil?
-              self.extras["#{key}"] = []
+            if @extras["#{key}"].nil?
+              @extras["#{key}"] = []
             end
           
-            self.extras["#{key}"] << val
+            @extras["#{key}"] << val
           end
         end
 
@@ -259,7 +259,7 @@ module Cedilla
       self.methods.each do |method|
         name = method.id2name.gsub('=', '')
         val = self.method(name).call if method.id2name[-1] == '=' and self.respond_to?(name)
-        ret["#{name}"] = val unless val.nil? or ['!', 'resources', 'authors'].include?(name)
+        ret["#{name}"] = val unless val.nil? or ['!', 'resources', 'authors', 'extras'].include?(name)
       end
 
       #authors to hash
@@ -271,6 +271,9 @@ module Cedilla
       resArr = Array.new
       @resources.each{ |res| resArr << res.to_hash if res.is_a?(Cedilla::Resource)}
       ret["resources"] = resArr unless resArr.nil? or resArr.empty?
+      
+      #extras if not empty
+      ret['extras'] = @extras unless @extras.empty?
       
       ret
     end

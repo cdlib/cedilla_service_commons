@@ -4,10 +4,12 @@ module Cedilla
    
     # -----------------------------------------------------------------------------------------------------------------
     def Translator.from_cedilla_json(json)
+      req = nil
+      
       begin
         hash = JSON.parse(json)
-        
-        req = Cedilla::Request.new(hash) unless hash['citation'].nil?
+
+        req = Cedilla::Request.new(convert_string_keys_to_symbols(hash)) unless hash['citation'].nil?
                        
       rescue Exception => e
         $stdout.puts("Exception transforming JSON to entities! #{e.message}")
@@ -16,6 +18,8 @@ module Cedilla
         
         throw(e)
       end
+      
+      req
     end
     
     # -----------------------------------------------------------------------------------------------------------------
@@ -64,6 +68,34 @@ module Cedilla
   private 
     def Translator.hash_to_query_string_recursive(hash, out)
       hash.map{ |k,v| v.is_a?(Array) ? v.each { |item| hash_to_query_string_recursive(item, out) } : out << "#{URI.escape(k)}=#{URI.escape(v.to_s)}" } if hash.is_a?(Hash)
+    end
+  
+    # ------------------------------------------------------------------
+    def Translator.convert_string_keys_to_symbols(hash)
+      ret = {}
+      
+      hash.each do |k,v|
+        if k.is_a?(String)
+          if v.is_a?(Hash)
+            ret[k.to_sym] =  convert_string_keys_to_symbols(v)
+            
+          elsif v.is_a?(Array)
+            arr = []
+            v.each do |item|
+              if item.is_a?(Hash)
+                arr << convert_string_keys_to_symbols(item)
+              else
+                arr << item
+              end
+            end
+            ret[k.to_sym] = arr
+          else
+            ret[k.to_sym] = v
+          end
+        end
+      end
+      
+      ret
     end
   end
   

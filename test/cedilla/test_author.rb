@@ -46,9 +46,8 @@ class TestAuthor < Minitest::Test
     
     assert_equal 'Some organization', @corporate.corporate_author, "Expected corporate author to be set on initialization!"
     assert_equal '1993-', @corporate.dates, "Expected dates to be set on initialization!"
-    
   end
-  
+
 # --------------------------------------------------------------------------------------------------
   def test_equality
     # Test invalid match

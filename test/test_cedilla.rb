@@ -2,46 +2,132 @@ require_relative './test_helper'
 
 WebMock.disable_net_connect!(:allow_localhost => true)
 
-# This test object should only evaluate the generic functionality of the service object
-# individual tests should be written for each implementation!!!
-class CedillaTest < Test::Unit::TestCase
+require 'cedilla/service'
+
+class CedillaTest < Minitest::Test
 
   def setup
     filepath = File.dirname(File.expand_path(__FILE__)) + '/config/'
     
-    config_empty = YAML::load(File.open(filepath + 'config_empty.yaml'))
     config_get = YAML::load(File.open(filepath + 'config_get.yaml'))
-    config_post = YAML::load(File.open(filepath + 'config_post.yaml'))
     
-    @cedilla_empty = CedillaService.new(config_empty)
-    @cedilla_get = CedillaService.new(config_get)
-    @cedilla_post = CedillaService.new(config_post)
+    @citation = Cedilla::Citation.new({:genre => 'book', 
+                                      :title => 'The Metamorphosis', 
+                                      :extras => {'foo' => ['bar']},
+                                      :authors => [Cedilla::Author.from_abritrary_string('Kafka, Franz')]})
     
-    @citation = Cedilla::Citation.new({:genre => 'book', :content_type => 'electronic', :title => 'The Metamorphosis', 
-                                       :authors => [Cedilla::Author.new({:last_name => 'Kafka', :first_name => 'J'})],
-                                       :resources => [{:source => 'source 1', :location => 'location 1'}, {:source => 'source 2', :target => 'http://www.ucop.edu/link/to/item', :availability => true}]})
+    @request = Cedilla::Request.new({:requestor_ip => '127.0.0.1',
+                                      :unmapped => 'foo=bar',
+                                      :api_ver => '1.0',
+                                      :original_request => 'rft.genre=book&foo=bar&rft.title=The%20Metamorphosis&rft.aulast=Kafka&rft.aufirst=F',
+                                      :citation => @citation})
   end
   
+# ------------------------------------------------------------------------------------------------------------
   def test_initialization
-    # Test empty cedilla
-    assert_equal "", @cedilla_empty.target, "Was expecting the target for cedilla_empty to be ''!"
+    # Wrong number of arguments
+    assert_raises(ArgumentError){ CedillaController.new("fail") }
     
-    # Test both GET and POST services of cedilla
-    svcs = {'get' => @cedilla_get, 'post' => @cedilla_post}
-    
-    svcs.each do |name, svc|
-      assert_equal "http://my.service.org/#{name}", svc.target, "Was expecting the target for '#{name}' service to be 'http://my.service.org/#{name}'!"
-      assert_equal "", svc.query_string, "Was expecting the query_string for '#{name}' service to be ''!"
-      assert_equal (name == 'get' ? 2 : 3), svc.max_attempts, "Was expecting the '#{name}' service to have #{svc.max_attempts} max attempts!"
-      assert_equal name, svc.http_method, "Was expecting the '#{name}' service to have an Http Method = '#{name}'!"
-      assert_equal 5, svc.http_timeout, "Was expecting the '#{name}' service to have an Http timeout = 5!"
-      assert_equal (name == 'get' ? true : false), svc.http_error_on_non_200, "Was expecting the '#{name}' service to #{name == 'get' ? '' : 'NOT' } auto-fail on non Http 2xx statuses!"
-      assert_equal (name == 'get' ? 3 : 5), svc.http_max_redirects, "Was expecting the '#{name}' service to have #{svc.http_max_redirects} max redirects!"
-      assert svc.http_cookies.nil?, "Was expecting the http_cookies for '#{name}' service to be nil!"
-      assert !svc.translator.nil?, "Was expecting the translator for '#{name}' service to be nil!"
-    end
-
+    assert CedillaController.new.is_a?(CedillaController)
   end
   
+# ------------------------------------------------------------------------------------------------------------  
+  def test_handle_request
+    cedilla = CedillaController.new
+    
+    # Check for bad JSON
+    response = MockHttpResponse.new
+    cedilla.handle_request(MockHttpRequest.new(MockHttpBody.new('{"test":"bad_json","data"')), response, @cedilla_get)
+    assert_equal 400, response.status, "Was expecting an HTTP 400 response!"
+    assert response.body.include?('unexpected token'), "Was expecting an 'unexpected token' message for an HTTP 400 response but got: #{response.body}"
+    
+    # Check for 404 handling
+    response = MockHttpResponse.new
+    cedilla.handle_request(MockHttpRequest.new(MockHttpBody.new(ARTICLE_JSON)), response, Mock404Service.new({}))
+    assert_equal 404, response.status, "Was expecting an HTTP 404 response!"
+    assert response.body.include?('"citations":[{}]'), "Was expecting a normal response with an empty citations element but got #{response.body}"
+    
+    response = MockHttpResponse.new
+    cedilla.handle_request(MockHttpRequest.new(MockHttpBody.new(ARTICLE_JSON)), response, Mock404_2Service.new({}))
+    assert_equal 404, response.status, "Was expecting an HTTP 404 response!"
+    assert response.body.include?('"citations":[{}]'), "Was expecting a normal response with an empty citations element but got #{response.body}"
+    
+    # Check for 500 handling
+    response = MockHttpResponse.new
+    cedilla.handle_request(MockHttpRequest.new(MockHttpBody.new(ARTICLE_JSON)), response, Mock500Service.new({}))
+    assert_equal 500, response.status, "Was expecting an HTTP 500 response!"
+    assert response.body.include?('error occurred while processing '), "Was expecting an error message when receiving an HTTP 500 but got #{response.body}"
+    
+    # Successful call
+    response = MockHttpResponse.new
+    cedilla.handle_request(MockHttpRequest.new(MockHttpBody.new(ARTICLE_JSON)), response, MockService200Service.new({}))
+    assert_equal 200, response.status, "Was expecting an HTTP 200 response!"
+    assert response.body.include?('"citations":[{"document_id":"TESTING"}]'), "Was expecting a normal response with a citations element but got #{response.body}"
+  end  
 
+end
+
+# ------------------------------------
+class MockHttpResponse
+  attr_accessor :status, :headers, :body
+  
+  def initialize
+    @status = 500
+    @headers = {}
+    @body = ""
+  end
+end
+
+# ------------------------------------
+class MockHttpRequest
+  attr_accessor :body, :ip, :referrer
+  
+  def initialize(body)
+    @referrer = 'web.site.org'
+    @body = body
+    @ip = '127.0.0.1'
+  end
+end
+
+# ------------------------------------
+class MockHttpBody
+  def initialize(json)
+    @body = json
+  end
+  
+  def rewind
+    true
+  end
+  
+  def read
+    @body
+  end
+end
+
+# ------------------------------------
+class MockService200Service < Cedilla::Service
+  def process_request(req, headers)
+    return Cedilla::Citation.new({:document_id => 'TESTING'})
+  end
+end
+
+# ------------------------------------
+class Mock404Service < Cedilla::Service
+  def validate_citation(citation)
+    false
+  end
+end
+
+# ------------------------------------
+class Mock404_2Service < Cedilla::Service
+  def process_request(req, headers)
+    Cedilla::Citation.new({})
+  end
+end
+
+# ------------------------------------
+class Mock500Service < Cedilla::Service
+  def process_request(req, headers)
+    raise 'Testing 500 errors from service!'
+  end
 end

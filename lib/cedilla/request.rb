@@ -25,7 +25,6 @@ module Cedilla
         @referrers = []
         params[:referrers].each{ |referer| @referrers << referer } unless params[:referrers].nil?
             
-            
         if params[:citation].is_a?(Cedilla::Citation)
           @citation = params[:citation]
       

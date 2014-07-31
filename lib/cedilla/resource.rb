@@ -27,11 +27,11 @@ module Cedilla
           if self.respond_to?("#{key}=")
             self.method("#{key}=").call(val)
           else
-            if self.extras["#{key}"].nil?
-              self.extras["#{key}"] = []
+            if @extras["#{key}"].nil?
+              @extras["#{key}"] = []
             end
           
-            self.extras["#{key}"] << val
+            @extras["#{key}"] << val
           end
         end
       
@@ -128,7 +128,7 @@ module Cedilla
         end
       end
       
-      ret = ret.merge(@extras)
+      ret['extras'] = @extras unless @extras.empty?
       
       ret
     end

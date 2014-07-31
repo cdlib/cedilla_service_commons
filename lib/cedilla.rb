@@ -53,17 +53,12 @@ class CedillaController
       id = json['id']
     
       unless id.nil?
-        LOGGER.info "Received request for id: #{id}"
-        LOGGER.debug data 
-      
         req = Cedilla::Translator.from_cedilla_json(data)
         
         req.requestor_ip = request.ip if req.requestor_ip.nil?
       
         begin
           if !service.validate_citation(req.citation)
-            # No ISBN or ISSN was passed, which this service requires so just send back a 404 Not Found
-            LOGGER.info "Request did not contain enough info to contact enpoint for id: #{id}"
             response.status = 404  
             response.body = Cedilla::Translator.to_cedilla_json(id, Cedilla::Citation.new({}))
           
@@ -76,8 +71,6 @@ class CedillaController
             response.status = (out.include?('"citations":[{}]') ? 404 : 200)
             
             response.body = out
-            
-            LOGGER.info "Response received from endpoint for id: #{id}"
           end
         
         rescue Exception => e
@@ -88,16 +81,13 @@ class CedillaController
             # No logging here because the service itself should have written out to the log
             response.body = Cedilla::Translator.to_cedilla_json(id, e)
           else
-            LOGGER.error "Error for id: #{id} --> #{e.message}"
-            LOGGER.error "#{e.backtrace}"
-          
             response.body = Cedilla::Translator.to_cedilla_json(id, Cedilla::Error.new(Cedilla::Error::LEVELS[:error], "An error occurred while processing the request."))
           end
         end
       
       else
-        LOGGER.error "The JSON received was invalid! No id was found in JSON."
-        LOGGER.error data
+        response.body = Cedilla::Translator.to_cedilla_json(id, Cedilla::Error.new(Cedilla::Error::LEVELS[:error], "Invalid JSON, no id defined at top level of document."))
+        
         response.status = 400
       end
       
@@ -105,9 +95,7 @@ class CedillaController
       # JSON parse exception should throw an invalid request!
       request.body.rewind
       
-      LOGGER.error "Error --> #{e.message}"
-      LOGGER.error "Request --> #{request.body.read}"
-      LOGGER.error "#{e.backtrace}"
+      response.body = Cedilla::Translator.to_cedilla_json(id, Cedilla::Error.new(Cedilla::Error::LEVELS[:error], e.message))
       response.status = 400
     end
     

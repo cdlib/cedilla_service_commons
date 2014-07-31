@@ -206,7 +206,7 @@ class TestResource < Minitest::Test
     assert_equal 'French', hash['language'], "Was expecting the language to be 'French'"
     assert_equal 'public domain', hash['license'], "Was expecting the license to be 'public domain'"
     
-    assert_equal ['blah'], hash['bogus_value1'], "Was expecting the bogus value to have been retained!"
+    assert_equal ['blah'], hash['extras']['bogus_value1'], "Was expecting the bogus value to have been retained!"
   end
 
 # --------------------------------------------------------------------------------------------------------  

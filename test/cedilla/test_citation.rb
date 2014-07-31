@@ -444,7 +444,7 @@ class TestCitation < MiniTest::Test
     assert_equal '34', hash['start_page'], "Was expecting the start page to be '34'!"
     assert_equal '45', hash['end_page'], "Was expecting the end page to be '45'!"
     assert_equal '34-45', hash['pages'], "Was expecting the pages to be '34-45'!"
-    
+ 
     assert_equal ['what?'], hash['extras']['what'], "Was expecting the extras array to have been included in the hash!"
     
     first_author = hash['authors'].first

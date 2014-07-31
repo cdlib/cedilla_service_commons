@@ -7,7 +7,7 @@ require 'webmock/minitest'
 
 require 'cedilla'
 
-@invalid_jsons = ['{"time":"2014-04-21T22:33:02.947Z"}',
+INVALID_JSONS = ['{"time":"2014-04-21T22:33:02.947Z"}',
                   '{"time":"2014-04-21T22:33:02.947Z","api_ver":"1.1"}',
                   '{"time":"2014-04-21T22:33:02.947Z","id":"123456"}',
                   '{"api_ver":"1.1","id":"123456"}',
@@ -15,7 +15,7 @@ require 'cedilla'
                   '{"time":"ABCD"}',
                   '{"api_ver":"ABCD"}']
 
-@book_json = '{"time":"2014-04-21T22:33:02.947Z",' +
+BOOK_JSON = '{"time":"2014-04-21T22:33:02.947Z",' +
               '"id":"ABCD1234",' +
               '"api_ver":"1.1",' +
               '"referrers":["google.com","domain.org"],' +
@@ -23,7 +23,7 @@ require 'cedilla'
               '"requestor_affiliation":"CAMPUS-A",' +
               '"requestor_language":"fr",' +
               '"unmapped":"pid=institute:info/SOMEWHERE&foo=bar",' +
-              '"original_request":"pid=institute:info/SOMEWHERE&rft.genre=book&rft.title=A+Tale+Of+Two+Cities&rft.au_first=Charles&rft.au_last=Dickens&rft.au=Doe%2C%20John&rft.au=Jane%20Doe%201910-1985&foo=bar",'
+              '"original_request":"pid=institute:info/SOMEWHERE&rft.genre=book&rft.title=A+Tale+Of+Two+Cities&rft.au_first=Charles&rft.au_last=Dickens&rft.au=Doe%2C%20John&rft.au=Jane%20Doe%201910-1985&foo=bar",' + 
               '"citation":{"genre":"journal",' +
                           '"title":"A Tale Of Two Cities",' +
                           '"content_type":"full_text",' +
@@ -31,7 +31,7 @@ require 'cedilla'
                                      '{"full_name":"Doe, John"},' +
                                      '{"full_name":"Jane Doe 1910-1985"}]}}'
                                      
-@journal_json = '{"time":"2014-06-30T23:11:11.301Z",' +
+JOURNAL_JSON = '{"time":"2014-06-30T23:11:11.301Z",' +
                  '"id":"123456",' +
                  '"api_ver":"1.1",' +
                  '"requestor_ip":"127.0.0.1",' +
@@ -45,7 +45,7 @@ require 'cedilla'
                              '"content_type":"full_text",' +
                              '"oclc":"9506582"}}'
     
-@article_json = '{"time":"2014-06-30T23:11:11.304Z",' +
+ARTICLE_JSON = '{"time":"2014-06-30T23:11:11.304Z",' +
                  '"id":"123456",' +
                  '"api_ver":"1.1",' +
                  '"requestor_ip":"127.0.0.1",' +
@@ -66,7 +66,7 @@ require 'cedilla'
                              '"pmid":"18574385",' +
                              '"publication_place":"Frederick, MD"}}'
 
-@chapter_json = '{"time":"2014-06-30T23:11:11.486Z",' +
+CHAPTER_JSON = '{"time":"2014-06-30T23:11:11.486Z",' +
                  '"id":"123456",' +
                  '"api_ver":"1.1",' +
                  '"requestor_ip":"127.0.0.1",' +
