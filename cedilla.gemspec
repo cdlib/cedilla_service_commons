@@ -13,24 +13,24 @@ Gem::Specification.new do |s|
   s.license     = 'BSD-3-Clause'
   s.has_rdoc    = false
   
-  gem.files = [
+  s.files = [
     "Gemfile",
     "Rakefile", 
     "cedilla.gemspec", 
-    "LICENSE.txt",
+    "LICENSE.md",
     "README.md",
     "lib/cedilla.rb",
     "lib/cedilla/author.rb",
-    "lib/cedilla/cittion.rb",
+    "lib/cedilla/citation.rb",
     "lib/cedilla/error.rb",
     "lib/cedilla/request.rb",
     "lib/cedilla/resource.rb",
     "lib/cedilla/service.rb",
     "lib/cedilla/translator.rb"]
   
-  gem.add_dependency 'json', '~> 1.8', '>= 1.8.1'
-  gem.add_dependency 'rake', '~> 10.3', '>= 10.3.2'
+  s.add_dependency 'json', '~> 1.8', '>= 1.8.1'
+  s.add_dependency 'rake', '~> 10.3', '>= 10.3.2'
   
-  gem.add_development_dependency 'minitest', '~> 5.40'
-  gem.add_development_dependency 'webmock', '~> 1.17'
+  s.add_development_dependency 'minitest', '~> 5.4'
+  s.add_development_dependency 'webmock', '~> 1.17'
 end
