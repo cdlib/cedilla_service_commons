@@ -19,7 +19,7 @@ For a concrete example of this Gem being used to ease the work needed to build y
 
 ## Installation 
 #### If you use Git and want Git to help you manage this gem's codebase
-```
+```shell
 > cd [project root]
 > git submodule add https://github.com/cdlib/cedilla_service_commons.git vendor/cedilla_service_commons
 > cd vendor/cedilla_service_commons
@@ -28,7 +28,7 @@ For a concrete example of this Gem being used to ease the work needed to build y
 ``` 
 
 #### If you don't use Git or don't want the gem as part of your project
-```
+```shell
 > git clone https://github.com/cdlib/cedilla_service_commons.git
 > cd cedilla_service_commons
 > gem build cedilla.gemspec
@@ -152,7 +152,7 @@ end
 Once the files have been created yoou can start the Sinatra web server by typing ```> ruby my_project.rb ```.
 
 Then in a separate tab you can test the service by using the curl command and send the controller some test JSON.
-```json
+```shell
 > curl --data '{"time":"2014-06-30T23:11:11.700Z","id":"e9d6576astor_ip":"127.0.0.1","citation":{"authors":[{"last_name":"Dickens"}],"title":"A Tale of Two Cities","genre":"book"}}' http://localhost:4567/my_service
 ```
 
@@ -189,7 +189,7 @@ You must ALWAYS override the Cedilla::Service.process_response method. This meth
 ## Notes on including this project as a Git submodule in your own project
 * When this code base is updated you will need to do a: ```> git submodule update``` and then install the new version of the gem.
 * If you clone your project onto a machine you will need to do the following after the initial clone:
-```
+```shell
 > git submodule init
 > git submodule update
 > cd vendor/cedilla_service_commons
@@ -200,7 +200,7 @@ You must ALWAYS override the Cedilla::Service.process_response method. This meth
 
 ## Notes on using Bundler in your project
 If you use Bundler in a project that implements this Ruby gem, you may potentially need to do the following whenever this gem is updated:
-```
+```shell
 > cd [project root]
 > rm *.lock
 > bundle install
