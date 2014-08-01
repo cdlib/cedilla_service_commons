@@ -1,6 +1,9 @@
 # Ruby Gem For Creating Cedilla Services
 
 ## Overview
+
+[![Build Status](https://secure.travis-ci.org/cdlib/cedilla_service_commons.png?branch=master)](http://travis-ci.org/cdlib/cedilla_service_commons)
+
 This is a ruby gem that can be used to help you build out services for your implementation of services used within the larger Cedilla ecosystem: https://github.com/cdlib/cedilla.  
 
 The gem provides you with a uniform way of parsing JSON messages from cedilla and serializing JSON messages back to cedilla. It also provides you with a standardized data model (Request, Citation, Author, and Resource) and a service which makes a call to your HTTP endpoint. 
@@ -8,13 +11,11 @@ The gem provides you with a uniform way of parsing JSON messages from cedilla an
 The gem allows you to quickly create a cedilla service without having to worry about parsing JSON requests from Cedilla, serializing JSON messages sent back to cedilla, or dealing with HTTP calls, redirects, and error handling. You can spend your time focused on dealing with what's important, managing the format of the querystring or form data being passed to the endpoint and handling responses from the endpoint.
 
 For a concrete example of this Gem being used to ease the work needed to build your cedilla services, look at the cedilla_services project: https://github.com/cdlib/cedilla_services. That project uses this Ruby gem as a base for services used to communicate with SFX, Internet Archive, CoverThing, Worldcat Discovery, etc.
-__
-
-#### Build Status:
-[![Build Status](https://secure.travis-ci.org/cdlib/cedilla_service_commons.png?branch=master)](http://travis-ci.org/cdlib/cedilla_service_commons)
 
 #### Dependencies
 
+* Ruby 2.1.x
+* Minitest and Webmock gems if you're going to run the tests (just run ```bundle install``` to pull them down)
 
 ## Installation 
 #### If you use Git and want Git to help you manage this gem's codebase
