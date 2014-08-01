@@ -81,7 +81,7 @@ class CedillaController
             # No logging here because the service itself should have written out to the log
             response.body = Cedilla::Translator.to_cedilla_json(id, e)
           else
-            response.body = Cedilla::Translator.to_cedilla_json(id, Cedilla::Error.new(Cedilla::Error::LEVELS[:error], "An error occurred while processing the request."))
+            response.body = Cedilla::Translator.to_cedilla_json(id, Cedilla::Error.new(Cedilla::Error::LEVELS[:error], "An error occurred while processing the request: #{e.message}"))
           end
         end
       
