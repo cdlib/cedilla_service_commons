@@ -152,12 +152,12 @@ end
 Once the files have been created yoou can start the Sinatra web server by typing ```> ruby my_project.rb ```.
 
 Then in a separate tab you can test the service by using the curl command and send the controller some test JSON.
-```
+```json
 > curl --data '{"time":"2014-06-30T23:11:11.700Z","id":"e9d6576astor_ip":"127.0.0.1","citation":{"authors":[{"last_name":"Dickens"}],"title":"A Tale of Two Cities","genre":"book"}}' http://localhost:4567/my_service
 ```
 
 You should receive a JSON response from the controller that is a representation of a citation update from our test endpoint. Here is what the response should look like:
-```
+```json
 {"time":"2014-08-01 09:42:32 -0700",
  "id":"e9d6576a-99a8-4ffb-95ae-7bb363c482f0",
  "citations":[{"publisher":"Well known publishing house",
