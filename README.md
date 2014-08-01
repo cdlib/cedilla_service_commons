@@ -64,7 +64,6 @@ class MyService < Cedilla::Service
     puts "HTTP Body from endpoint: "
     puts @response_body
     
-    
     Cedilla::Citation.new({:publisher => 'Well known publishing house',
                            :publication_place => 'London',
                            :authors => [{:last_name => 'Dickens', :first_name => 'Charles'}]})
