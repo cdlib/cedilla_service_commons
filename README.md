@@ -65,7 +65,9 @@ class MyService < Cedilla::Service
     puts @response_body
     
     
-    Cedilla::Citation.new({:genre => 'book', :title => 'A Tale Of Two Cities', :authors => [{:last_name => 'Dickens'}]})
+    Cedilla::Citation.new({:publisher => 'Well known publishing house',
+                           :publication_place => 'London',
+                           :authors => [{:last_name => 'Dickens', :first_name => 'Charles'}]})
   end
   
   # --------------------------------------------------------------------------------
