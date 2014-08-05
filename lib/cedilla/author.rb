@@ -35,7 +35,7 @@ module Cedilla
     end
 
 # --------------------------------------------------------------------------------------------------------------------    
-    def self.from_abritrary_string(value)
+    def self.from_arbitrary_string(value)
       params = {}
       
       params[:dates] = value.slice(/[0-9\-]+/) unless value.slice(/[0-9\-]+/).nil?
@@ -157,7 +157,7 @@ module Cedilla
 
 # --------------------------------------------------------------------------------------------------------------------          
     def full_name=(val)
-      auth = Cedilla::Author.from_abritrary_string(val)
+      auth = Cedilla::Author.from_arbitrary_string(val)
       
       @dates = auth.dates unless auth.dates.nil?
       

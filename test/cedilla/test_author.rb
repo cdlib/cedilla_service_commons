@@ -85,7 +85,7 @@ class TestAuthor < Minitest::Test
 
 # --------------------------------------------------------------------------------------------------
   def test_arbitrary_name_handling
-    auth = Cedilla::Author.from_abritrary_string('Sam, Yosemite A.')
+    auth = Cedilla::Author.from_arbitrary_string('Sam, Yosemite A.')
     assert_equal 'Yosemite A. Sam', auth.full_name, "Wrong full_name for 'Sam, Yosemite A.'"
     assert_equal 'Yosemite', auth.first_name, "Wrong first_name for 'Sam, Yosemite A.'"
     assert_equal 'Sam', auth.last_name, "Wrong last_name for 'Sam, Yosemite A.'"
@@ -93,7 +93,7 @@ class TestAuthor < Minitest::Test
     assert_equal 'Y.', auth.first_initial, "Wrong first_initial for 'Sam, Yosemite A.'"
     assert_equal 'Y. A.', auth.initials, "Wrong initials for 'Sam, Yosemite A.'"
     
-    auth = Cedilla::Author.from_abritrary_string('Sam, Y. A.')
+    auth = Cedilla::Author.from_arbitrary_string('Sam, Y. A.')
     assert_equal 'Y. A. Sam', auth.full_name, "Wrong full_name for 'Sam, Y. A.'"
     assert_equal 'Y.', auth.first_name, "Wrong first_name for 'Sam, Y. A.'"
     assert_equal 'Sam', auth.last_name, "Wrong last_name for 'Sam, Y. A.'"
@@ -101,7 +101,7 @@ class TestAuthor < Minitest::Test
     assert_equal 'Y.', auth.first_initial, "Wrong first_initial for 'Sam, Y. A.'"
     assert_equal 'Y. A.', auth.initials, "Wrong initials for 'Sam, Y. A.'"
     
-    auth = Cedilla::Author.from_abritrary_string('Y. A. Sam')
+    auth = Cedilla::Author.from_arbitrary_string('Y. A. Sam')
     assert_equal 'Y. A. Sam', auth.full_name, "Wrong full_name for 'Y. A. Sam'"
     assert_equal 'Y.', auth.first_name, "Wrong first_name for 'Y. A. Sam'"
     assert_equal 'Sam', auth.last_name, "Wrong last_name for 'Y. A. Sam'"
@@ -109,7 +109,7 @@ class TestAuthor < Minitest::Test
     assert_equal 'Y.', auth.first_initial, "Wrong first_initial for 'Y. A. Sam'"
     assert_equal 'Y. A.', auth.initials, "Wrong initials for 'Y. A. Sam'"
     
-    auth = Cedilla::Author.from_abritrary_string('Yosemite A. Sam')
+    auth = Cedilla::Author.from_arbitrary_string('Yosemite A. Sam')
     assert_equal 'Yosemite A. Sam', auth.full_name, "Wrong full_name for 'Yosemite A. Sam'"
     assert_equal 'Yosemite', auth.first_name, "Wrong first_name for 'Yosemite A. Sam'"
     assert_equal 'Sam', auth.last_name, "Wrong last_name for 'Yosemite A. Sam'"
@@ -117,7 +117,7 @@ class TestAuthor < Minitest::Test
     assert_equal 'Y.', auth.first_initial, "Wrong first_initial for 'Yosemite A. Sam'"
     assert_equal 'Y. A.', auth.initials, "Wrong intials for 'Yosemite A. Sam'"
     
-    auth = Cedilla::Author.from_abritrary_string('Sam, Yosemite')
+    auth = Cedilla::Author.from_arbitrary_string('Sam, Yosemite')
     assert_equal 'Yosemite Sam', auth.full_name, "Wrong full_name for 'Sam, Yosemite'"
     assert_equal 'Yosemite', auth.first_name, "Wrong first_name for 'Sam, Yosemite'"
     assert_equal 'Sam', auth.last_name, "Wrong last_name for 'Sam, Yosemite'"
@@ -125,7 +125,7 @@ class TestAuthor < Minitest::Test
     assert_equal 'Y.', auth.first_initial, "Wrong first_initial for 'Sam, Yosemite'"
     assert_equal 'Y.', auth.initials, "Wrong initials for 'Sam, Yosemite'"
     
-    auth = Cedilla::Author.from_abritrary_string('Yosemite Sam')
+    auth = Cedilla::Author.from_arbitrary_string('Yosemite Sam')
     assert_equal 'Yosemite Sam', auth.full_name, "Wrong full_name for 'Yosemite Sam'"
     assert_equal 'Yosemite', auth.first_name, "Wrong first_name for 'Yosemite Sam'"
     assert_equal 'Sam', auth.last_name, "Wrong last_name for 'Yosemite Sam'"
@@ -133,7 +133,7 @@ class TestAuthor < Minitest::Test
     assert_equal 'Y.', auth.first_initial, "Wrong first_initial for 'Yosemite Sam'"
     assert_equal 'Y.', auth.initials, "Wrong initials for 'Yosemite Sam'"
     
-    auth = Cedilla::Author.from_abritrary_string('Yosemite')
+    auth = Cedilla::Author.from_arbitrary_string('Yosemite')
     assert_equal 'Yosemite', auth.full_name, "Wrong full_name for 'Yosemite'"
     assert_equal nil, auth.first_name, "Wrong first_name for 'Yosemite'"
     assert_equal 'Yosemite', auth.last_name, "Wrong last_name for 'Yosemite'"

@@ -36,7 +36,7 @@ class TestService < Minitest::Test
     @citation = Cedilla::Citation.new({:genre => 'book', 
                                       :title => 'The Metamorphosis', 
                                       :extras => {'foo' => ['bar']},
-                                      :authors => [Cedilla::Author.from_abritrary_string('Kafka, Franz')]})
+                                      :authors => [Cedilla::Author.from_arbitrary_string('Kafka, Franz')]})
     
     @request = Cedilla::Request.new({:requestor_ip => '127.0.0.1',
                                       :unmapped => 'foo=bar',
