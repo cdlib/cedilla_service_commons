@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'cedilla'
-  s.version     = '0.1.13'
-  s.date        = '2014-08-01'
+  s.version     = '0.1.14'
+  s.date        = '2014-08-06'
   s.summary     = 'Cedilla Service Commons'
   s.description = 'A gem containing request, citation, author, and resource models as well as a Cedilla JSON <--> Model translator and a base controller and service implementation.'
   s.authors     = ['briley', 'lliu']

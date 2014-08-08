@@ -21,6 +21,7 @@ class TestCitation < MiniTest::Test
                                        :oai => 'oai:foo.org:some-local-id-53',
                                        :nbn => 'nbn:ch:bel-9596',
                                        :hdl => 'hdl:loc:pnp/cph.3c30104',
+                                       :naxos => 'EUCD2045',
                                        :dissertation_number => '1234567890ABC',
                                        :title => 'Example Title', 
                                        :journal_title => 'Some <escape me> \ Journal', :article_title => 'Good Article',
@@ -82,6 +83,7 @@ class TestCitation < MiniTest::Test
     assert_equal 'oai:foo.org:some-local-id-53', @citation.oai, "Was expecting the oai to be set!"
     assert_equal 'nbn:ch:bel-9596', @citation.nbn, "Was expecting the nbn to be set!"
     assert_equal 'hdl:loc:pnp/cph.3c30104', @citation.hdl, "Was expecting the hdl to be set!"
+    assert_equal 'EUCD2045', @citation.naxos, "Was expecting the naxos to be set!"
     assert_equal '1234567890ABC', @citation.dissertation_number, "Was expecting the dissertation_number to be set!"
     assert_equal 'Example Title', @citation.title, "Was expecting the title to be set!"
     assert_equal 'Some <escape me> \ Journal', @citation.journal_title, "Was expecting the journal_title to be set!"
@@ -231,6 +233,12 @@ class TestCitation < MiniTest::Test
     assert a != @citation, "Was expecting a to not equal @citation because the hdls do not match"
     assert b == @citation, "Was expecting b to equal @citation because the hdls match"
     
+    a = Cedilla::Citation.new({:genre => 'book', :naxos => '1234-1234'})
+    b = Cedilla::Citation.new({:genre => 'journal', :naxos => 'EUCD2045'})
+    assert a != b, "Was expecting a to not equal b because the hdls do not match"
+    assert a != @citation, "Was expecting a to not equal @citation because the hdls do not match"
+    assert b == @citation, "Was expecting b to equal @citation because the hdls match"
+    
     a = Cedilla::Citation.new({:genre => 'book', :title => '1234-1234'})
     b = Cedilla::Citation.new({:genre => 'journal', :title => 'Example Title'})
     assert a != b, "Was expecting a to not equal b because the titles do not match"
@@ -323,6 +331,7 @@ class TestCitation < MiniTest::Test
     assert Cedilla::Citation.new({:genre => 'article', :oai => '123'}).has_identifier?, "Expected there to be an identifier for oai!"
     assert Cedilla::Citation.new({:genre => 'article', :nbn => '123'}).has_identifier?, "Expected there to be an identifier for nbn!"
     assert Cedilla::Citation.new({:genre => 'article', :hdl => '123'}).has_identifier?, "Expected there to be an identifier for hdl!"
+    assert Cedilla::Citation.new({:genre => 'article', :naxos => '123'}).has_identifier?, "Expected there to be an identifier for naxos!"
     
     # Test that it returns true when it has multiple identifiers
     assert @citation.has_identifier?, "Expected citation to confirm an identifier exists when multiple identifiers are defined!"
@@ -368,8 +377,9 @@ class TestCitation < MiniTest::Test
     assert !@citation.identifiers['nbn'].nil?, "Expected there to be a NBN!"
     assert !@citation.identifiers['hdl'].nil?, "Expected there to be a HDL!"
     assert !@citation.identifiers['eric'].nil?, "Expected there to be a ERIC!"
+    assert !@citation.identifiers['naxos'].nil?, "Expected there to be a NAXOS!"
     
-    assert_equal 18, @citation.identifiers.size, "Was expecting 18 identifiers to have been set!"
+    assert_equal 19, @citation.identifiers.size, "Was expecting 18 identifiers to have been set!"
   end 
   
 # --------------------------------------------------------------------------------------------------------  
@@ -414,6 +424,7 @@ class TestCitation < MiniTest::Test
     assert_equal 'oai:foo.org:some-local-id-53', hash['oai'], "Was expecting the oai to be 'oai:foo.org:some-local-id-53'!"
     assert_equal 'nbn:ch:bel-9596', hash['nbn'], "Was expecting the nbn to be 'nbn:ch:bel-9596'!"
     assert_equal 'hdl:loc:pnp/cph.3c30104', hash['hdl'], "Was expecting the hdl to be 'hdl:loc:pnp/cph.3c30104'!"
+    assert_equal 'EUCD2045', hash['naxos'], "Was expecting the naxos to be 'EUCD2045'!"
     
     assert_equal 'Example Title', hash['title'], "Was expecting the title to be 'Example Title'!"
     assert_equal 'Good Article', hash['article_title'], "Was expecting the article title to be 'Good Article'!"
