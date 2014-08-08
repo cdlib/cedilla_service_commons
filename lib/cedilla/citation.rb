@@ -12,7 +12,7 @@ module Cedilla
     # Identifiers
     attr_accessor :issn, :eissn, :isbn, :eisbn, :isbn, :eisbn, :oclc, :lccn, :doi
     attr_accessor :pmid, :coden, :sici, :bici, :document_id, :dissertation_number
-    attr_accessor :bibcode, :eric, :oai, :nbn, :hdl
+    attr_accessor :bibcode, :eric, :oai, :nbn, :hdl, :naxos
     
     # Titles
     attr_accessor :title, :article_title, :journal_title, :chapter_title, :book_title, :short_title
@@ -92,15 +92,17 @@ module Cedilla
         ret = @oai == object.oai if (!@oai.nil? and !object.oai.nil?) and !ret
         ret = @nbn == object.nbn if (!@nbn.nil? and !object.nbn.nil?) and !ret
         ret = @hdl == object.hdl if (!@hdl.nil? and !object.hdl.nil?) and !ret
+        ret = @naxos == object.naxos if (!@naxos.nil? and !object.naxos.nil?) and !ret
         
         # If no ids matched and either this Citation or the one passed in has no ids then match by titles!
         if (@issn.nil? and @eissn.nil? and @isbn.nil? and @eisbn.nil? and @oclc.nil? and @lccn.nil? and @doi.nil? and @pmid.nil? and
                           @coden.nil? and @sici.nil? and @bici.nil? and @document_id.nil? and @dissertation_number.nil? and
-                          @bibcode.nil? and @eric.nil? and @oai.nil? and @nbn.nil? and @hdl.nil?) or
+                          @bibcode.nil? and @eric.nil? and @oai.nil? and @nbn.nil? and @hdl.nil? and @naxos.nil?) or
                   (object.issn.nil? and object.eissn.nil? and object.isbn.nil? and object.eisbn.nil? and object.oclc.nil? and 
                           object.lccn.nil? and object.doi.nil? and object.pmid.nil? and object.coden.nil? and object.sici.nil? and 
                           object.bici.nil? and object.document_id.nil? and object.dissertation_number.nil? and
-                          object.bibcode.nil? and object.eric.nil? and object.oai.nil? and object.nbn.nil? and object.hdl.nil?)
+                          object.bibcode.nil? and object.eric.nil? and object.oai.nil? and object.nbn.nil? and object.hdl.nil? and
+                          object.naxos.nil?)
                           
           ret = @article_title == object.article_title if (!@article_title.nil? and !object.article_title.nil?) and !ret
           ret = @book_title == object.book_title if (!@book_title.nil? and !object.book_title.nil?) and !ret
@@ -168,7 +170,7 @@ module Cedilla
             (!@bici.nil? and @bici != '') or (!@document_id.nil? and @document_id != '') or
             (!@dissertation_number.nil? and @dissertation_number != '')      or (!@bibcode.nil? and @bibcode != '') or
             (!@eric.nil? and @eric != '') or (!@oai.nil? and @oai != '') or 
-            (!@nbn.nil? and @nbn != '')   or (!@hdl.nil? and @hdl != ''))
+            (!@nbn.nil? and @nbn != '')   or (!@hdl.nil? and @hdl != '') or (!@naxos.nil? and @naxos != ''))
     end
     
 # --------------------------------------------------------------------------------------------------------------------
@@ -221,7 +223,8 @@ module Cedilla
       ret['eric'] = @eric unless @eric.nil? or @eric == ''
       ret['oai'] = @oai unless @oai.nil? or @oai == ''
       ret['nbn'] = @nbn unless @nbn.nil? or @nbn == ''
-      ret['hdl'] = @hdl unless @hdl.nil? or @hdl == ''     
+      ret['hdl'] = @hdl unless @hdl.nil? or @hdl == ''  
+      ret['naxos'] = @naxos unless @naxos.nil? or @naxos == ''     
       ret
     end
 
