@@ -119,7 +119,7 @@ module Cedilla
 
 # --------------------------------------------------------------------------------------------------------------------    
     def first_name=(val)
-      @first_name = val.strip
+      @first_name = val.nil? ? '' : val.strip
       @first_initial = "#{val[0].gsub(' ', '').upcase}."
       
       @initials = "#{@first_initial} #{@middle_initial}".strip
@@ -127,7 +127,7 @@ module Cedilla
 
 # --------------------------------------------------------------------------------------------------------------------        
     def first_initial=(val)
-      @first_initial = val.strip
+      @first_initial = val.nil? ? '' : val.strip
       
       @first_name = @first_initial if @first_name.nil?
       
@@ -136,23 +136,25 @@ module Cedilla
         
 # --------------------------------------------------------------------------------------------------------------------        
     def middle_initial=(val)
-      @middle_initial = val.strip
+      @middle_initial = val.nil? ? '' : val.strip
       
       @initials = "#{@first_initial.nil? ? '' : "#{@first_initial} "}#{@middle_initial}"
     end
     
 # --------------------------------------------------------------------------------------------------------------------    
     def initials=(val)
-      @initials = val.strip
+      @initials = val.nil? ? '' : val.strip
       
-      inits = val.split('. ')
-      @first_initial = "#{inits[0]}." if @first_name.nil?
-      @middle_initial = inits[1]
+      unless val.nil?
+        inits = val.split('. ')
+        @first_initial = "#{inits[0]}." if @first_name.nil?
+        @middle_initial = inits[1]
+      end
     end
 
 # --------------------------------------------------------------------------------------------------------------------          
     def last_name=(val)
-      @last_name = val.strip
+      @last_name = val.nil? ? '' : val.strip
     end
 
 # --------------------------------------------------------------------------------------------------------------------          
