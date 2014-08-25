@@ -33,7 +33,7 @@ module Cedilla
       
         @config = config
       else
-        raise Error.new("You must supply a configuration hash!")
+        raise Error.new('error', "You must supply a configuration hash!")
       end
     end
   
