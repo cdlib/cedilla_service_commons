@@ -52,10 +52,10 @@ class TestService < Minitest::Test
     assert_raises(ArgumentError){ Cedilla::Service.new("fail", {}) }
     
     # Argument not a Hash
-    assert_raises(ArgumentError){ Cedilla::Service.new(nil) }
-    assert_raises(ArgumentError){ Cedilla::Service.new('123') }
-    assert_raises(ArgumentError){ Cedilla::Service.new(123) }
-    assert_raises(ArgumentError){ Cedilla::Service.new(['bar','123']) }
+    assert_raises(Cedilla::Error){ Cedilla::Service.new(nil) }
+    assert_raises(Cedilla::Error){ Cedilla::Service.new('123') }
+    assert_raises(Cedilla::Error){ Cedilla::Service.new(123) }
+    assert_raises(Cedilla::Error){ Cedilla::Service.new(['bar','123']) }
     
     # Test empty cedilla
     assert_equal nil, @cedilla_empty.target, "Was expecting the target for cedilla_empty to be ''!"
