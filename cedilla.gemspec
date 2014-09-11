@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
     "lib/cedilla/translator.rb"]
   
   s.add_dependency 'json', '~> 1.8', '>= 1.8.1'
-  s.add_dependency 'rake', '~> 10.1.0', '>= 10.3.2'
+#  s.add_dependency 'rake', '~> 10.1.0', '>= 10.3.2'
   
   s.add_development_dependency 'minitest', '~> 5.4'
   s.add_development_dependency 'webmock', '~> 1.17'
